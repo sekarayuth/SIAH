@@ -96,10 +96,10 @@
             <div class="login-body">
                 <form id="loginForm" onsubmit="handleLogin(event)">
                     <div class="mb-3">
-                        <label class="form-label fw-semibold small">Alamat Email</label>
+                        <label class="form-label fw-semibold small">Username</label>
                         <div class="input-group">
-                            <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                            <input type="email" class="form-control" id="email" placeholder="nama@email.com" required>
+                            <span class="input-group-text"><i class="fas fa-user"></i></span>
+                            <input type="text" class="form-control" id="username" placeholder="nama pengguna" required>
                         </div>
                     </div>
                     
@@ -140,31 +140,36 @@
         async function handleLogin(event) {
             event.preventDefault(); 
             
-            const emailInput = document.getElementById('email').value.trim();
+            const usernameInput = document.getElementById('username').value.trim();
             const passwordInput = document.getElementById('password').value;
             const btnLogin = document.getElementById('btnLogin');
             
+            // Menggunakan domain siah.id sebagai identitas internal database
+            const dummyEmail = `${usernameInput}@siah.id`; 
+
             const teksAsli = btnLogin.innerHTML;
             btnLogin.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Memproses...';
             btnLogin.disabled = true;
 
             try {
                 const { data, error } = await supabaseClient.auth.signInWithPassword({
-                    email: emailInput,
+                    email: dummyEmail, 
                     password: passwordInput,
                 });
 
                 if (error) throw error;
 
-                if (emailInput.toLowerCase() === 'admindpmd@siah.ac.id') {
+                // Logika pengalihan halaman
+                // Jika username adalah 'admindpmd', maka email di sistem adalah 'admindpmd@siah.id'
+                if (usernameInput.toLowerCase() === 'admindpmd') {
                     window.location.href = 'admin.html';
                 } else {
-                    window.location.href = 'index.html';
+                    window.location.href = 'dashboard.html'; 
                 }
 
             } catch (err) {
                 console.error("Error Login:", err.message);
-                alert("Gagal Masuk: " + err.message);
+                alert("Gagal Masuk: Username atau Password salah.");
                 btnLogin.innerHTML = teksAsli;
                 btnLogin.disabled = false;
             }
