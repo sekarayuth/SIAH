@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIAH Dasbor Desa - Unggah Berkas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --gov-primary: #0f4c3a; --gov-secondary: #198754; --bg-light: #f4f7f6; --text-dark: #2c3e50; }
+        body { background-color: var(--bg-light); font-family: 'Poppins', sans-serif; color: var(--text-dark); overflow-x: hidden; }
+        .section-title { font-weight: 700; color: var(--gov-primary); position: relative; display: inline-block; margin-bottom: 10px; }
+        .section-title::after { content: ''; width: 50%; height: 4px; background-color: #f39c12; position: absolute; bottom: -10px; left: 25%; border-radius: 2px; }
+        
+        .card-layanan { border: none; border-radius: 20px; color: white; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; overflow: hidden; z-index: 1; }
+        .card-layanan::before { content: ""; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: rgba(255, 255, 255, 0.1); transform: rotate(30deg); z-index: -1; transition: all 0.5s ease; }
+        .card-layanan:hover::before { top: -100%; left: -100%; }
+        .card-layanan:hover { transform: translateY(-12px); box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+        .bg-pengajuan { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+        .bg-pemberhentian { background: linear-gradient(135deg, #cb2d3e 0%, #ef473a 100%); }
+        .bg-mutasi { background: linear-gradient(135deg, #FF8008 0%, #FFC837 100%); }
+        .btn-rounded { border-radius: 50px; font-weight: 500; }
+
+        #wrapper { display: flex; width: 100%; align-items: stretch; overflow-x: hidden; }
+        #sidebar-wrapper { min-height: 100vh; width: 260px; background: linear-gradient(180deg, var(--gov-primary) 0%, #062b20 100%); color: white; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); box-shadow: 4px 0 20px rgba(0,0,0,0.1); z-index: 1050; }
+        #page-content-wrapper { width: 100%; flex: 1; min-width: 0; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
+        #wrapper.toggled #sidebar-wrapper { margin-left: -260px; }
+        
+        .sidebar-brand { padding: 25px 20px; font-size: 1.3rem; font-weight: 800; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; }
+        .sidebar-nav { padding: 15px 10px; }
+        .nav-item-desa { color: rgba(255,255,255,0.7); padding: 12px 20px; margin-bottom: 5px; border-radius: 12px; display: flex; align-items: center; font-weight: 500; text-decoration: none; transition: all 0.3s ease; }
+        .nav-item-desa:hover, .nav-item-desa.active { color: white; background: linear-gradient(90deg, var(--gov-secondary) 0%, rgba(25,135,84,0.5) 100%); box-shadow: 0 4px 15px rgba(25,135,84,0.3); transform: translateX(5px); }
+        .nav-item-desa i { width: 30px; font-size: 1.1rem; }
+        
+        .top-navbar { background: white; margin: 15px 25px; border-radius: 15px; padding: 10px 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.02); }
+        .btn-toggle { background: var(--bg-light); border: none; color: var(--gov-primary); border-radius: 10px; padding: 8px 15px; transition: 0.3s; cursor: pointer; }
+        .btn-toggle:hover { background: var(--gov-primary); color: white; }
+
+        @media (max-width: 768px) { #sidebar-wrapper { margin-left: -260px; position: fixed; height: 100vh; overflow-y: auto; } #wrapper.toggled #sidebar-wrapper { margin-left: 0; } #page-content-wrapper { margin-left: 0 !important; } }
+    </style>
+</head>
+<body>
+    <div id="wrapper">
+        <div id="sidebar-wrapper">
+            <div class="sidebar-brand"><i class="fas fa-building text-warning me-2"></i><span>SIAH Desa</span></div>
+            <div class="sidebar-nav">
+                <p class="text-uppercase" style="font-size: 0.7rem; color: rgba(255,255,255,0.4); margin: 15px 0 5px 15px; font-weight: 600;">Menu Utama</p>
+                <a href="dashboard.html" class="nav-item-desa"><i class="fas fa-home me-2"></i>Dasbor & Regulasi</a>
+                <a href="lacak_usulan.html" class="nav-item-desa"><i class="fas fa-search-location me-2"></i>Lacak & Progres Usulan</a>
+                <a href="unggah_berkas.html" class="nav-item-desa active"><i class="fas fa-cloud-upload-alt me-2"></i>Pengajuan Berkas</a>
+                <a href="pengajuan_selesai.html" class="nav-item-desa"><i class="fas fa-check-circle me-2"></i>Pengajuan Selesai</a>
+                <div class="mt-5 px-3">
+                    <a href="login.html" class="btn btn-outline-danger w-100 fw-bold" style="border-radius: 12px;"><i class="fas fa-sign-out-alt me-2"></i>Keluar / Logout</a>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-content-wrapper">
+            <nav class="navbar top-navbar d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <button type="button" class="btn-toggle me-3" onclick="document.getElementById('wrapper').classList.toggle('toggled');">
+                        <i class="fas fa-bars fa-lg" style="pointer-events: none;"></i>
+                    </button>
+                    <h5 class="m-0 fw-bold d-none d-sm-block text-dark">Ruang Kerja Pemerintah Desa</h5>
+                </div>
+                <!-- <div class="d-flex align-items-center gap-3">
+                    <div class="d-flex align-items-center pe-2 border-start ms-2 ps-3">
+                        <div class="text-end me-3 d-none d-md-block">
+                            <span class="d-block fw-bold text-dark" style="font-size: 0.9rem;">Admin Desa</span>
+                            <span class="text-muted" style="font-size: 0.75rem;">Kab. Malang</span>
+                        </div>
+                        <div class="rounded-circle shadow-sm d-flex align-items-center justify-content-center fw-bold text-white" style="width: 42px; height: 42px; background-color: var(--gov-primary); font-size: 1.2rem;">D</div>
+                    </div>
+                </div> -->
+            </nav>
+
+            <div class="container-fluid px-4 py-3">
+                <section class="mt-4 pt-4">
+                    <div class="text-center mb-5">
+                        <h3 class="section-title">Layanan Pengunggahan Berkas</h3>
+                        <p class="text-muted mt-3">Pilih modul layanan di bawah ini untuk mengunggah usulan dokumen PDF yang telah diverifikasi fisik.</p>
+                    </div>
+                    <div class="row g-4">
+                        <div class="col-lg-4">
+                            <div class="card card-layanan bg-pengajuan h-100 p-5 text-center shadow-lg">
+                                <div class="mb-4 bg-white rounded-circle d-inline-flex align-items-center justify-content-center mx-auto" style="width: 80px; height: 80px;">
+                                    <i class="fas fa-user-plus fa-2x" style="color: #11998e;"></i>
+                                </div>
+                                <h4 class="fw-bold mb-3">Pengangkatan</h4>
+                                <p class="mb-4 small opacity-75">Unggah dokumen penetapan calon perangkat desa baru yang telah lolos seleksi.</p>
+                                <button class="btn btn-light btn-rounded mt-auto fw-bold text-success w-100 py-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#usulanModal" onclick="pilihLayanan('pengajuan')">
+                                    <i class="fas fa-upload me-2"></i> Unggah Berkas
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="card card-layanan bg-pemberhentian h-100 p-5 text-center shadow-lg">
+                                <div class="mb-4 bg-white rounded-circle d-inline-flex align-items-center justify-content-center mx-auto" style="width: 80px; height: 80px;">
+                                    <i class="fas fa-user-times fa-2x" style="color: #cb2d3e;"></i>
+                                </div>
+                                <h4 class="fw-bold mb-3">Pemberhentian</h4>
+                                <p class="mb-4 small opacity-75">Unggah dokumen pemberhentian karena purna tugas, mengundurkan diri, dsb.</p>
+                                <button class="btn btn-light btn-rounded mt-auto fw-bold text-danger w-100 py-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#usulanModal" onclick="pilihLayanan('pemberhentian')">
+                                    <i class="fas fa-upload me-2"></i> Unggah Berkas
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="card card-layanan bg-mutasi h-100 p-5 text-center shadow-lg">
+                                <div class="mb-4 bg-white rounded-circle d-inline-flex align-items-center justify-content-center mx-auto" style="width: 80px; height: 80px;">
+                                    <i class="fas fa-exchange-alt fa-2x" style="color: #FF8008;"></i>
+                                </div>
+                                <h4 class="fw-bold mb-3">Mutasi Jabatan</h4>
+                                <p class="mb-4 small opacity-75">Unggah dokumen pergeseran atau perpindahan posisi jabatan perangkat desa.</p>
+                                <button class="btn btn-light btn-rounded mt-auto fw-bold text-warning w-100 py-2 shadow-sm" style="color: #d35400 !important;" data-bs-toggle="modal" data-bs-target="#usulanModal" onclick="pilihLayanan('mutasi')">
+                                    <i class="fas fa-upload me-2"></i> Unggah Berkas
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="usulanModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 15px;">
+                <div class="modal-header text-white" id="modalHeader" style="background-color: var(--gov-primary); border-top-left-radius: 15px; border-top-right-radius: 15px;">
+                    <h5 class="modal-title fw-bold" id="modalTitle"><i class="fas fa-cloud-upload-alt me-2"></i> Formulir Pengajuan Usulan</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4 p-md-5">
+                    <div id="alertRevisi" class="alert alert-warning d-none mb-4 small shadow-sm" style="border-radius: 10px;">
+                        <i class="fas fa-exclamation-triangle me-2"></i><b>Mode Revisi Aktif:</b> Data wilayah tidak bisa diubah. Silakan pilih ulang file PDF yang telah diperbaiki.
+                    </div>
+                    <div id="alertSK" class="alert alert-info d-none mb-4 small shadow-sm" style="border-radius: 10px;">
+                        <i class="fas fa-file-signature me-2"></i><b>Tahap Akhir (Upload SK):</b> Silakan unggah dokumen SK Kepala Desa berdasarkan Surat Rekomendasi Bupati yang telah Anda ambil.
+                    </div>
+
+                    <form id="formUsulan">
+                        <div class="mb-4" id="divLayanan">
+                            <label class="form-label fw-semibold text-success">Kategori Layanan</label>
+                            <input type="hidden" id="hiddenPilihanLayanan" value="">
+                            <select class="form-select border-success bg-light fw-bold text-dark" id="pilihanLayanan" disabled>
+                                <option value="default" disabled>Pilih kategori...</option>
+                                <option value="pengajuan">Pengangkatan Perangkat Baru</option>
+                                <option value="pemberhentian">Pemberhentian Perangkat</option>
+                                <option value="mutasi">Mutasi Jabatan</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Kecamatan</label>
+                            <select class="form-select bg-light" id="selectKecamatan" required onchange="populateDesa()">
+                                <option value="" selected disabled>-- Memuat Kecamatan... --</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Desa</label>
+                            <select class="form-select bg-light" id="selectDesa" required disabled>
+                                <option value="" selected disabled>-- Pilih Kecamatan Dulu --</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-2 p-3 border rounded bg-light" id="boxUploadFile">
+                            <label class="form-label fw-semibold text-primary" id="labelUploadFile">Unggah Seluruh Berkas (.PDF)</label>
+                            <input type="file" id="filePDF" class="form-control" accept=".pdf" required>
+                            <div class="form-text mt-2 text-danger small" id="textUploadHelp">
+                                <i class="fas fa-info-circle me-1"></i> Gabungkan Surat Pengantar & Persyaratan menjadi 1 file PDF (Maksimal 10MB).
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 pt-3 border-top d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-outline-secondary btn-rounded px-4" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" id="btnSubmit" class="btn btn-success btn-rounded px-5 fw-bold shadow-sm"><i class="fas fa-paper-plane me-2"></i> Kirim Usulan</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        const _supabaseUrl = 'https://trkppiiwtsanrkhfssbi.supabase.co'; 
+        const _supabaseKey = 'sb_publishable_Byr6eUuyMWGPGKnwuqw_Xg_86vR47uZ';
+        
+        // NAMA VARIABEL DIGANTI JADI supabaseClient AGAR TIDAK BENTROK
+        let supabaseClient;
+
+        async function initPage() {
+            if (!window.supabase) {
+                alert("ERROR: Library Supabase tidak terbaca! Pastikan koneksi internet stabil.");
+                return;
+            }
+
+            // Inisialisasi dengan nama variabel baru
+            supabaseClient = window.supabase.createClient(_supabaseUrl, _supabaseKey);
+            await loadKecamatan();
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const targetId = urlParams.get('id');
+            const currentMode = urlParams.get('mode');
+
+            if (targetId) {
+                const myModal = new bootstrap.Modal(document.getElementById('usulanModal'));
+                myModal.show();
+
+                if(currentMode === 'revisi' || !currentMode) {
+                    document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit me-2"></i> Unggah Revisi Usulan';
+                    document.getElementById('alertRevisi').classList.remove('d-none');
+                    document.getElementById('btnSubmit').innerHTML = '<i class="fas fa-upload me-2"></i> Kirim Revisi';
+                } else if (currentMode === 'sk') {
+                    document.getElementById('modalHeader').style.backgroundColor = '#0d6efd';
+                    document.getElementById('modalTitle').innerHTML = '<i class="fas fa-file-signature me-2"></i> Unggah SK Penetapan Desa';
+                    document.getElementById('alertSK').classList.remove('d-none');
+                    document.getElementById('divLayanan').classList.add('d-none');
+                    document.getElementById('labelUploadFile').innerText = 'Unggah Dokumen SK Kades (.PDF)';
+                    document.getElementById('btnSubmit').className = "btn btn-primary btn-rounded px-5 fw-bold shadow-sm";
+                    document.getElementById('btnSubmit').innerHTML = '<i class="fas fa-upload me-2"></i> Unggah SK';
+                }
+
+                try {
+                    const { data } = await supabaseClient.from('usulan').select('*').eq('id', targetId).single();
+                    if (data) {
+                        document.getElementById('selectKecamatan').value = data.kecamatan;
+                        await populateDesa();
+                        document.getElementById('selectDesa').value = data.desa;
+                        
+                        let valLayanan = 'pengajuan';
+                        if(data.jenis_layanan.toLowerCase().includes('berhenti')) valLayanan = 'pemberhentian';
+                        if(data.jenis_layanan.toLowerCase().includes('mutasi')) valLayanan = 'mutasi';
+                        document.getElementById('pilihanLayanan').value = valLayanan;
+                        
+                        document.getElementById('selectKecamatan').disabled = true;
+                        document.getElementById('selectDesa').disabled = true;
+                    }
+                } catch(e) {
+                    console.log("Data lama tidak ditemukan atau error:", e);
+                }
+            }
+        }
+
+        async function loadKecamatan() {
+            const selectKec = document.getElementById("selectKecamatan");
+            try {
+                // Menggunakan supabaseClient
+                const { data, error } = await supabaseClient.from('wilayah_malang').select('kecamatan');
+                if (error) {
+                    console.error("Supabase Error:", error);
+                    return;
+                }
+                if (data && data.length > 0) {
+                    const uniqueKec = [...new Set(data.map(item => item.kecamatan))].sort();
+                    selectKec.innerHTML = '<option value="" selected disabled>-- Pilih Kecamatan --</option>';
+                    uniqueKec.forEach(kec => {
+                        const opt = document.createElement("option");
+                        opt.value = kec; opt.text = kec;
+                        selectKec.appendChild(opt);
+                    });
+                }
+            } catch (err) {
+                console.error("Gagal load kecamatan:", err);
+            }
+        }
+
+        async function populateDesa() {
+            const selectedKec = document.getElementById("selectKecamatan").value;
+            const desaSelect = document.getElementById("selectDesa");
+            desaSelect.disabled = true;
+            desaSelect.innerHTML = '<option value="">Memuat Desa...</option>';
+
+            // Menggunakan supabaseClient
+            const { data, error } = await supabaseClient
+                .from('wilayah_malang')
+                .select('desa')
+                .eq('kecamatan', selectedKec)
+                .order('desa', { ascending: true });
+
+            if (data) {
+                desaSelect.innerHTML = '<option value="" selected disabled>-- Pilih Desa --</option>';
+                data.forEach(item => {
+                    const opt = document.createElement("option");
+                    opt.value = item.desa; opt.text = "Desa " + item.desa;
+                    desaSelect.appendChild(opt);
+                });
+                desaSelect.disabled = false;
+            }
+        }
+
+        function pilihLayanan(jenis) {
+            document.getElementById('hiddenPilihanLayanan').value = jenis;
+            document.getElementById('pilihanLayanan').value = jenis;
+        }
+
+        document.getElementById('formUsulan').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmit');
+            const originalBtnText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Mengunggah...';
+
+            const file = document.getElementById('filePDF').files[0];
+            const kec = document.getElementById('selectKecamatan').value;
+            const desa = document.getElementById('selectDesa').value;
+            const layanan = document.getElementById('pilihanLayanan').options[document.getElementById('pilihanLayanan').selectedIndex].text;
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const targetId = urlParams.get('id');
+            const currentMode = urlParams.get('mode');
+
+            try {
+                const folder = currentMode === 'sk' ? 'sk_desa' : 'berkas_gabungan';
+                const fileName = `${folder}/${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
+                
+                // Menggunakan supabaseClient.storage
+                const { error: upErr } = await supabaseClient.storage.from('berkas_siah').upload(fileName, file);
+                if (upErr) throw new Error("Gagal mengunggah file. Pastikan Bucket 'berkas_siah' sudah dibuat di Supabase.");
+                
+                // Menggunakan supabaseClient.storage
+                const { data: urlData } = supabaseClient.storage.from('berkas_siah').getPublicUrl(fileName);
+                const publicUrl = urlData.publicUrl;
+
+                if (currentMode === 'sk') {
+                    // Menggunakan supabaseClient.from
+                    await supabaseClient.from('usulan').update({
+                        sk_url: publicUrl, status: 'SK Diunggah', catatan_admin: 'Proses usulan Selesai.'
+                    }).eq('id', targetId);
+                    alert("Sukses! SK Kades berhasil diunggah.");
+                } else if (targetId) {
+                    await supabaseClient.from('usulan').update({
+                        surat_pengantar_url: publicUrl, berkas_persyaratan_url: publicUrl, status: 'Menunggu Verifikasi', catatan_admin: 'Revisi terkirim.'
+                    }).eq('id', targetId);
+                    alert("Selesai! Revisi berhasil dikirim.");
+                } else {
+                    await supabaseClient.from('usulan').insert([{
+                        kecamatan: kec, desa: desa, jenis_layanan: layanan,
+                        surat_pengantar_url: publicUrl, berkas_persyaratan_url: publicUrl, status: 'Menunggu Verifikasi'
+                    }]);
+                    alert("Selesai! Usulan baru berhasil terkirim.");
+                }
+                
+                window.location.href = 'lacak_usulan.html';
+                
+            } catch (err) {
+                alert("Gagal: " + err.message);
+                btn.disabled = false;
+                btn.innerHTML = originalBtnText;
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', initPage);
+    </script>
+</body>
+</html>

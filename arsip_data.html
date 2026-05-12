@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arsip Data Bulanan - Admin SIAH DPMD</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        :root {
+            --gov-primary: #0a3622;
+            --gov-secondary: #198754;
+            --bg-body: #f4f7fa;
+            --text-dark: #2b3445;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+
+        /* --- Sidebar --- */
+        #wrapper { display: flex; width: 100%; align-items: stretch; overflow-x: hidden; }
+        #sidebar-wrapper {
+            min-height: 100vh; width: 260px;
+            background: linear-gradient(180deg, var(--gov-primary) 0%, #061c12 100%);
+            color: white; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 4px 0 20px rgba(0,0,0,0.1); z-index: 1050;
+        }
+        #page-content-wrapper { width: 100%; flex: 1; min-width: 0; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
+        #wrapper.toggled #sidebar-wrapper { margin-left: -260px; }
+        
+        .sidebar-brand {
+            padding: 25px 20px; font-size: 1.3rem; font-weight: 800; letter-spacing: 1px;
+            border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center;
+        }
+        .sidebar-nav { padding: 15px 10px; }
+        .nav-item-admin {
+            color: rgba(255,255,255,0.6); padding: 12px 20px; margin-bottom: 5px;
+            border-radius: 12px; display: flex; align-items: center; font-weight: 500;
+            text-decoration: none; transition: all 0.3s ease;
+        }
+        .nav-item-admin:hover { color: white; background: rgba(255,255,255,0.1); transform: translateX(5px); }
+        .nav-item-admin.active {
+            color: white; background: linear-gradient(90deg, var(--gov-secondary) 0%, rgba(25,135,84,0.5) 100%);
+            box-shadow: 0 4px 15px rgba(25,135,84,0.3);
+        }
+        .nav-item-admin i { width: 30px; font-size: 1.1rem; }
+
+        .top-navbar {
+            background: white; margin: 15px 25px; border-radius: 15px;
+            padding: 10px 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.02);
+        }
+        .btn-toggle { background: var(--bg-body); border: none; color: var(--gov-primary); border-radius: 10px; padding: 8px 15px; transition: 0.3s; cursor: pointer; }
+        .btn-toggle:hover { background: var(--gov-primary); color: white; }
+
+        /* --- Styling Timeline Tracking --- */
+        /* --- FINAL ENHANCED TIMELINE UI (Gunakan ini saja) --- */
+        .tracking-list { 
+            position: relative; 
+            padding: 20px 5px; 
+            margin-top: 10px;
+        }
+
+        .timeline-item {
+            padding-left: 35px;
+            border-left: 3px solid #dee2e6; /* Garis default abu-abu */
+            position: relative;
+            padding-bottom: 30px;
+            transition: all 0.3s ease;
+        }
+
+        /* Lingkaran Ikon (Pas di tengah garis) */
+        .timeline-icon {
+            position: absolute;
+            left: -17.5px; 
+            top: 0;
+            width: 32px;
+            height: 32px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            z-index: 2;
+            border: 2px solid currentColor;
+        }
+
+        /* Kotak Detail Pengambil */
+        .info-box-pengambil {
+            background-color: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            border-left: 4px solid var(--gov-secondary);
+            margin-top: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        /* Warna Garis kalau status aktif (Hijau) */
+        .timeline-item.border-success {
+            border-left: 3px solid var(--gov-secondary) !important;
+        }
+
+        /* Menghilangkan garis di item paling bawah */
+        .timeline-item:last-child { 
+            border-left: 3px solid transparent !important; 
+        }
+        .tabel-pdf { width: 100%; border-collapse: collapse; font-family: "Times New Roman", serif; color: black; }
+        .tabel-pdf th, .tabel-pdf td { border: 1px solid black; padding: 5px; font-size: 9pt; text-align: center; }
+        .tabel-pdf th { font-weight: bold; background-color: #f2f2f2; }
+
+        @media (max-width: 768px) {
+            #sidebar-wrapper { margin-left: -260px; position: fixed; height: 100vh; overflow-y: auto; }
+            #wrapper.toggled #sidebar-wrapper { margin-left: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="wrapper">
+        <div id="sidebar-wrapper">
+            <div class="sidebar-brand">
+                <i class="fas fa-shield-halved text-success" style="font-size: 1.5rem; margin-right: 10px;"></i>
+                <span>SIAH Admin</span>
+            </div>
+            <div class="sidebar-nav">
+                <p class="text-uppercase" style="font-size: 0.7rem; color: rgba(255,255,255,0.4); margin: 15px 0 5px 15px; font-weight: 600;">Menu Utama</p>
+                <a href="admin.html" class="nav-item-admin "><i class="fas fa-gauge-high me-2"></i>Dasbor Utama</a>
+                <a href="verifikasi.html" class="nav-item-admin"><i class="fas fa-file-signature me-2"></i>Verifikasi Usulan</a>
+                <a href="arsip_data.html" class="nav-item-admin active"><i class="fas fa-archive me-2"></i>Arsip Data Bulanan</a>
+                <a href="arsip_sk.html" class="nav-item-admin "><i class="fas fa-file-pdf me-2"></i>Arsip SK Kecamatan</a>
+                <div class="mt-5 px-3">
+                    <a href="login.html" class="btn btn-outline-light w-100" style="border-radius: 12px; opacity: 0.8;"><i class="fas fa-sign-out-alt me-2"></i>Keluar / Logout</a>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-content-wrapper">
+            <nav class="navbar top-navbar d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <button type="button" class="btn-toggle me-3" onclick="document.getElementById('wrapper').classList.toggle('toggled');">
+                        <i class="fas fa-bars fa-lg"></i>
+                    </button>
+                    <h5 class="m-0 fw-bold text-dark">Pusat Data Arsip</h5>
+                </div>
+            </nav>
+
+            <div class="container-fluid px-4 py-3">
+                <div class="mb-4">
+                    <h4 class="fw-bold text-dark m-0"><i class="fas fa-folder-open text-success me-2"></i> Arsip Keputusan Bulanan</h4>
+                    <p class="text-muted small mt-1">Lacak dan rekapitulasi data usulan perangkat desa.</p>
+                </div>
+
+                <div class="card border-0 shadow-sm mb-5" style="border-radius: 15px;">
+                    <div class="card-header bg-white border-bottom pt-4 pb-3 px-4 d-flex justify-content-between align-items-end flex-wrap">
+                        <div class="d-flex gap-3 mt-3 mt-md-0 flex-wrap">
+                            <div>
+                                <label class="form-label small fw-bold text-muted mb-1">Filter Bulan:</label>
+                                <select id="filterBulan" class="form-select border-success fw-medium bg-light">
+                                    <option value="all">Semua Bulan</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label small fw-bold text-muted mb-1">Cari Kecamatan:</label>
+                                <input type="text" id="searchKecamatan" class="form-control border-success bg-light" placeholder="Nama kecamatan...">
+                            </div>
+                            <div>
+                                <label class="form-label small fw-bold text-muted mb-1">Jenis Layanan:</label>
+                                <select id="filterJenis" class="form-select border-success fw-medium bg-light">
+                                    <option value="all" selected>Semua Jenis</option>
+                                    <option value="angkat">Pengangkatan</option>
+                                    <option value="henti">Pemberhentian</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-danger fw-bold shadow-sm px-4 mt-3 mt-md-0" onclick="downloadPDF()">
+                            <i class="fas fa-file-pdf me-2"></i> Cetak Laporan
+                        </button>
+                    </div>
+
+                    <div class="card-body px-4 py-4 bg-white">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle text-center" id="tabelArsip">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>No.</th>
+                                        <th class="text-start">Keterangan Usulan</th>
+                                        <th>Lokasi</th>
+                                        <th>Layanan</th>
+                                        <th>Status/Nomor</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dataArsip">
+                                    <tr>
+                                        <td colspan="6" class="py-5 text-center text-muted">
+                                            <i class="fas fa-spinner fa-spin fs-2 mb-3 text-success"></i><br>Memuat Data...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div id="pesanKosong" class="text-center py-4 text-danger" style="display: none;">
+                                <h6><i class="fas fa-search me-2"></i>Data tidak ditemukan.</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalTracking" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-md modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 15px; border:none;">
+                <div class="modal-header bg-success text-white" style="border-radius: 15px 15px 0 0;">
+                    <h5 class="modal-title fw-bold"><i class="fas fa-route me-2"></i>Tracking Usulan</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4" id="contentTracking">
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        const _supabaseUrl = 'https://trkppiiwtsanrkhfssbi.supabase.co'; 
+        const _supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRya3BwaWl3dHNhbnJraGZzc2JpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyMDQ2MjMsImV4cCI6MjA5Mzc4MDYyM30.3FXToAhNzMX7Bf73YHFL8TEsovp5Mt6qk-M2Fs0OVqo';                
+        const supabaseClient = window.supabase.createClient(_supabaseUrl, _supabaseKey);
+
+        async function loadArsipData() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('usulan')
+                    .select('*')
+                    .ilike('status', 'selesai')
+                    .in('status', ['Selesai', 'SK Diunggah', 'Ditolak'])
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+                console.log("Data Usulan Selesai/Ditolak:", data);
+
+                const tbody = document.getElementById('dataArsip');
+                if (data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" class="py-4">Belum ada data.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = '';
+                const setBulanUnik = new Set(); 
+
+                data.forEach((item, index) => {
+                    const dateObj = new Date(item.created_at);
+                    const formatDataBulan = `${String(dateObj.getMonth() + 1).padStart(2, '0')}-${dateObj.getFullYear()}`;
+                    setBulanUnik.add(JSON.stringify({ value: formatDataBulan, label: dateObj.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' }) }));
+
+                    let filterJenisVal = item.jenis_layanan?.toLowerCase().includes('angkat') ? 'angkat' : 'henti';
+                    let statusBadge = item.status === 'Ditolak' ? 'bg-danger' : 'bg-success';
+                    const resNomor = (item.status !== 'Ditolak') ? `141/0${item.id.toString().substring(0,3)}/KEP/35.07/${dateObj.getFullYear()}` : `Ditolak`;
+
+                    const tr = document.createElement('tr');
+                    tr.className = "arsip-row";
+                    tr.setAttribute("data-bulan", formatDataBulan);
+                    tr.setAttribute("data-jenis", filterJenisVal);
+                    tr.setAttribute("data-kecamatan", item.kecamatan || ""); // Untuk filter pencarian
+
+                    tr.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td class="text-start">
+                            <span class="fw-bold text-dark">#USL-${item.id.toString().substring(0,5)}</span><br>
+                            <span class="badge ${statusBadge} small">Status: ${item.status}</span>
+                        </td>
+                        <td>Desa ${item.desa}<br><small class="text-muted">Kec. ${item.kecamatan}</small></td>
+                        <td><span class="badge bg-light text-success border border-success px-2">${item.jenis_layanan}</span></td>
+                        <td class="small fw-medium">${resNomor}<br><small class="text-muted">Update: ${dateObj.toLocaleDateString('id-ID')}</small></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-success border-0" onclick="lihatTracking('${item.id}')" title="Lacak Proses">
+                                <i class="fas fa-eye fa-lg"></i>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                // Populate Dropdown
+                const dropdownBulan = document.getElementById("filterBulan");
+                const arrBulan = Array.from(setBulanUnik).map(s => JSON.parse(s)).sort((a,b) => b.value.localeCompare(a.value));
+                arrBulan.forEach(b => {
+                    const opt = document.createElement('option');
+                    opt.value = b.value; opt.textContent = b.label;
+                    dropdownBulan.appendChild(opt);
+                });
+
+                jalankanFilter();
+            } catch (error) {
+                console.error(error);
+                document.getElementById('dataArsip').innerHTML = `<tr><td colspan="6" class="text-danger">Gagal memuat data.</td></tr>`;
+            }
+        }
+
+        function jalankanFilter() {
+            const nBulan = document.getElementById("filterBulan").value;
+            const nJenis = document.getElementById("filterJenis").value;
+            const sKec = document.getElementById("searchKecamatan").value.toLowerCase();
+            
+            let ditemukan = 0;
+            let noUrut = 1; 
+            
+            document.querySelectorAll(".arsip-row").forEach(row => {
+                const cocokBulan = (nBulan === "all" || nBulan === row.dataset.bulan);
+                const cocokJenis = (nJenis === "all" || nJenis === row.dataset.jenis);
+                const cocokKec = row.getAttribute("data-kecamatan").toLowerCase().includes(sKec);
+                
+                if (cocokBulan && cocokJenis && cocokKec) { 
+                    row.style.display = ""; 
+                    row.cells[0].innerText = noUrut++;
+                    ditemukan++; 
+                } else { 
+                    row.style.display = "none"; 
+                }
+            });
+            document.getElementById("pesanKosong").style.display = ditemukan === 0 ? "block" : "none";
+        }
+
+        async function lihatTracking(idUsulan) {
+            const content = document.getElementById('contentTracking');
+            content.innerHTML = '<div class="text-center py-5"><i class="fas fa-spinner fa-spin fa-2x text-success"></i><br><small class="text-muted mt-2 d-block">Menarik Riwayat...</small></div>';
+            
+            const myModal = new bootstrap.Modal(document.getElementById('modalTracking'));
+            myModal.show();
+
+            const { data, error } = await supabaseClient
+                .from('usulan')
+                .select('*')
+                .eq('id', idUsulan)
+                .single();
+
+            if (data) {
+                const s = data.status;
+                const fmtDate = (dateStr) => {
+                    if (!dateStr) return null;
+                    const d = new Date(dateStr);
+                    return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) + " | " + 
+                        d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + " WIB";
+                };
+
+                const isSelesai = s === 'Selesai';
+                const checkStep = (statusArray) => statusArray.includes(s) || isSelesai ? 'text-success' : 'text-muted opacity-50';
+                const checkLine = (statusArray) => statusArray.includes(s) || isSelesai ? 'border-success' : '';
+
+                content.innerHTML = `
+                    <div class="mb-4 text-center">
+                        <span class="badge bg-light text-dark border px-3 py-2 shadow-sm" style="border-radius: 10px;">
+                        <i class="fas fa-ticket text-success me-2"></i>#USL-${data.id.toString().substring(0,6).toUpperCase()}
+                        </span>
+                    </div>
+
+                    <div class="tracking-list">
+                        <div class="timeline-item border-success">
+                            <i class="fas fa-file-export timeline-icon text-success"></i>
+                            <div class="ms-3">
+                                <span class="fw-bold d-block text-dark">Berkas Diajukan oleh Desa</span>
+                                <small class="text-muted"><i class="far fa-clock me-1"></i> ${fmtDate(data.created_at)}</small>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item ${checkLine(['Proses Bupati', 'Rekomendasi Turun', 'Sudah Diambil', 'Selesai'])}">
+                            <i class="fas fa-user-tie timeline-icon ${checkStep(['Proses Bupati', 'Rekomendasi Turun', 'Sudah Diambil', 'Selesai'])}"></i>
+                            <div class="ms-3">
+                                <span class="fw-bold d-block text-dark">Proses Penandatanganan Bupati</span>
+                                <small class="text-muted">
+                                    ${data.tgl_bupati ? `<i class="far fa-calendar-check me-1"></i> ${fmtDate(data.tgl_bupati)}` : 'Menunggu antrean berkas...'}
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item ${checkLine(['Rekomendasi Turun', 'Sudah Diambil', 'Selesai'])}">
+                            <i class="fas fa-envelope-open-text timeline-icon ${checkStep(['Rekomendasi Turun', 'Sudah Diambil', 'Selesai'])}"></i>
+                            <div class="ms-3">
+                                <span class="fw-bold d-block text-dark">Surat Rekomendasi Turun</span>
+                                <small class="text-muted">
+                                    ${data.tgl_rekom ? `<i class="far fa-calendar-check me-1"></i> ${fmtDate(data.tgl_rekom)}` : 'Berkas sedang diproses DPMD'}
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item ${checkLine(['Sudah Diambil', 'Selesai'])}">
+                            <i class="fas fa-handshake timeline-icon ${checkStep(['Sudah Diambil', 'Selesai'])}"></i>
+                            <div class="ms-3">
+                                <span class="fw-bold d-block text-dark">Pengambilan Berkas Fisik</span>
+                                ${data.nama_penerima ? `
+                                <div class="info-box-pengambil">
+                                    <div class="mb-1 small"><i class="fas fa-user text-success me-2"></i><b>Penerima:</b> ${data.nama_penerima}</div>
+                                    <div class="mb-1 small"><i class="fas fa-briefcase text-success me-2"></i><b>Jabatan:</b> ${data.jabatan_penerima}</div>
+                                    <div class="small"><i class="fas fa-calendar-alt text-success me-2"></i><b>Diambil:</b> ${fmtDate(data.tgl_ambil)}</div>
+                                </div>` : `<small class="text-muted">Belum ada data pengambilan</small>`}
+                            </div>
+                        </div>
+
+                        <div class="timeline-item border-0 pb-0">
+                            <i class="fas fa-check-double timeline-icon ${isSelesai ? 'text-success' : 'text-muted opacity-50'}"></i>
+                            <div class="ms-3">
+                                <span class="fw-bold d-block text-dark">Proses Selesai (Arsip SK)</span>
+                                <small class="text-muted d-block mb-2">
+                                    ${isSelesai ? `<i class="fas fa-check-circle text-success me-1"></i> Selesai pada ${fmtDate(data.updated_at)}` : 'Menunggu upload SK desa'}
+                                </small>
+                                ${isSelesai && data.sk_url ? `
+                                    <a href="${data.sk_url}" target="_blank" class="btn btn-dark btn-sm w-100 py-2 mt-2" style="border-radius: 10px;">
+                                        <i class="fas fa-file-pdf me-2"></i> Lihat Dokumen SK Terunggah
+                                    </a>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function downloadPDF() {
+            const elemenTabel = document.getElementById('tabelArsip');
+            const bulanLabel = document.getElementById('filterBulan').options[document.getElementById('filterBulan').selectedIndex].text;
+            
+            // Buat template laporan untuk PDF
+            const template = `
+                <div style="padding: 20px; font-family: 'Times New Roman', Times, serif;">
+                    <div style="text-align: center; border-bottom: 2px solid black; padding-bottom: 10px; margin-bottom: 20px;">
+                        <h4 style="margin: 0; text-transform: uppercase;">Pemerintah Kabupaten Malang</h4>
+                        <h3 style="margin: 0; text-transform: uppercase;">Dinas Pemberdayaan Masyarakat dan Desa</h3>
+                        <p style="margin: 0; font-size: 10pt;">Jl. Merdeka Timur No.3, Malang, Jawa Timur</p>
+                    </div>
+                    <h5 style="text-align: center; text-decoration: underline;">REKAPITULASI USULAN PERANGKAT DESA</h5>
+                    <p style="font-size: 10pt;">Periode: ${bulanLabel}</p>
+                    
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                        <thead>
+                            <tr style="background-color: #f2f2f2;">
+                                <th style="border: 1px solid black; padding: 5px; font-size: 9pt;">No</th>
+                                <th style="border: 1px solid black; padding: 5px; font-size: 9pt;">Desa</th>
+                                <th style="border: 1px solid black; padding: 5px; font-size: 9pt;">Kecamatan</th>
+                                <th style="border: 1px solid black; padding: 5px; font-size: 9pt;">Jenis Layanan</th>
+                                <th style="border: 1px solid black; padding: 5px; font-size: 9pt;">Status</th>
+                                <th style="border: 1px solid black; padding: 5px; font-size: 9pt;">Tgl Selesai</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${Array.from(document.querySelectorAll(".arsip-row"))
+                                .filter(row => row.style.display !== "none")
+                                .map((row, index) => `
+                                    <tr>
+                                        <td style="border: 1px solid black; padding: 5px; font-size: 9pt; text-align: center;">${index + 1}</td>
+                                        <td style="border: 1px solid black; padding: 5px; font-size: 9pt;">${row.cells[2].innerText.split('\n')[0]}</td>
+                                        <td style="border: 1px solid black; padding: 5px; font-size: 9pt;">${row.getAttribute('data-kecamatan')}</td>
+                                        <td style="border: 1px solid black; padding: 5px; font-size: 9pt; text-align: center;">${row.cells[3].innerText}</td>
+                                        <td style="border: 1px solid black; padding: 5px; font-size: 9pt; text-align: center;">${row.cells[1].innerText.split('\n')[1]}</td>
+                                        <td style="border: 1px solid black; padding: 5px; font-size: 9pt; text-align: center;">${row.cells[4].innerText.split('\n')[1]}</td>
+                                    </tr>
+                                `).join('')}
+                        </tbody>
+                    </table>
+                    <div style="margin-top: 30px; float: right; text-align: center; width: 200px;">
+                        <p style="font-size: 10pt;">Malang, ${new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'})}</p>
+                        <p style="font-size: 10pt; margin-top: 60px;"><b>Admin DPMD</b></p>
+                    </div>
+                </div>
+            `;
+
+            const opt = {
+                margin: 0.5,
+                filename: `Laporan_SIAH_${bulanLabel.replace(' ', '_')}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+
+            html2pdf().from(template).set(opt).save();
+        }
+
+        document.getElementById("filterBulan").addEventListener("change", jalankanFilter);
+        document.getElementById("filterJenis").addEventListener("change", jalankanFilter);
+        document.getElementById("searchKecamatan").addEventListener("input", jalankanFilter);
+        document.addEventListener('DOMContentLoaded', loadArsipData);
+    </script>
+</body>
+</html>

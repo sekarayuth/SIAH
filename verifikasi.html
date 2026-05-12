@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifikasi Usulan - Admin SIAH DPMD</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gov-primary: #0a3622;
+            --gov-secondary: #198754;
+            --bg-body: #f4f7fa;
+            --text-dark: #2b3445;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-dark);
+            overflow-x: hidden; 
+        }
+
+        /* --- Tata Letak & Sidebar --- */
+        #wrapper { display: flex; width: 100%; align-items: stretch; overflow-x: hidden; }
+        #sidebar-wrapper {
+            min-height: 100vh; width: 260px;
+            background: linear-gradient(180deg, var(--gov-primary) 0%, #061c12 100%);
+            color: white; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 4px 0 20px rgba(0,0,0,0.1); z-index: 1050;
+        }
+        #page-content-wrapper { width: 100%; flex: 1; min-width: 0; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
+        #wrapper.toggled #sidebar-wrapper { margin-left: -260px; }
+
+        .sidebar-brand {
+            padding: 25px 20px; font-size: 1.3rem; font-weight: 800; letter-spacing: 1px;
+            border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center;
+        }
+        .sidebar-nav { padding: 15px 10px; }
+        .nav-item-admin {
+            color: rgba(255,255,255,0.6); padding: 12px 20px; margin-bottom: 5px;
+            border-radius: 12px; display: flex; align-items: center; font-weight: 500;
+            text-decoration: none; transition: all 0.3s ease;
+        }
+        .nav-item-admin:hover { color: white; background: rgba(255,255,255,0.1); transform: translateX(5px); }
+        .nav-item-admin.active {
+            color: white; background: linear-gradient(90deg, var(--gov-secondary) 0%, rgba(25,135,84,0.5) 100%);
+            box-shadow: 0 4px 15px rgba(25,135,84,0.3);
+        }
+        .nav-item-admin i { width: 30px; font-size: 1.1rem; }
+
+        /* --- Navbar --- */
+        .top-navbar {
+            background: white; margin: 15px 25px; border-radius: 15px;
+            padding: 10px 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.02);
+        }
+        .btn-toggle {
+            background: var(--bg-body); border: none; color: var(--gov-primary);
+            border-radius: 10px; padding: 8px 15px; transition: 0.3s; cursor: pointer;
+        }
+        .btn-toggle:hover { background: var(--gov-primary); color: white; }
+
+        /* --- Dropdown Notifikasi --- */
+        .dropdown-menu-notif { width: 320px; border-radius: 15px; max-height: 400px; overflow-y: auto; }
+        .dropdown-item-notif { padding: 12px 20px; border-bottom: 1px solid #f1f1f1; white-space: normal; }
+        .dropdown-item-notif:hover { background-color: #f8f9fa; }
+
+        /* --- Filter Panel & Tabel --- */
+        .filter-panel { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.02); margin-bottom: 25px; }
+        .table-card { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.02); }
+        .table { border-collapse: separate; border-spacing: 0 10px; margin-top: -10px; }
+        .table:not(.table-pdf) thead th { border: none; color: #a0aec0; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; padding-bottom: 0; }
+        .table:not(.table-pdf) tbody tr { transition: all 0.2s; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+        .table:not(.table-pdf) tbody tr:hover { transform: scale(1.01); box-shadow: 0 5px 15px rgba(0,0,0,0.05); background-color: white !important; }
+        .table:not(.table-pdf) tbody td { background: white; border: none; padding: 15px; vertical-align: middle; }
+        .table:not(.table-pdf) tbody td:first-child { border-top-left-radius: 12px; border-bottom-left-radius: 12px; }
+        .table:not(.table-pdf) tbody td:last-child { border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
+
+        /* Badges */
+        .badge-soft-success { background: rgba(39, 174, 96, 0.1); color: #27ae60; padding: 6px 12px; border-radius: 30px; font-weight: 600; display: inline-block;}
+        .badge-soft-warning { background: rgba(243, 156, 18, 0.1); color: #e67e22; padding: 6px 12px; border-radius: 30px; font-weight: 600; display: inline-block;}
+        .badge-soft-danger { background: rgba(231, 76, 60, 0.1); color: #e74c3c; padding: 6px 12px; border-radius: 30px; font-weight: 600; display: inline-block;}
+
+        /* --- Modal Verifikasi --- */
+        .modal-xl-custom { max-width: 95%; }
+        .pdf-viewer-placeholder {
+            background-color: #333; height: 75vh; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center; color: white;
+            flex-direction: column; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); overflow: hidden;
+        }
+        iframe:-webkit-full-screen { width: 100% !important; height: 100% !important; background-color: white; }
+        iframe:-moz-full-screen { width: 100% !important; height: 100% !important; background-color: white; }
+        iframe:fullscreen { width: 100% !important; height: 100% !important; background-color: white; }
+        .checklist-box { background: var(--bg-body); border-radius: 10px; padding: 15px; margin-bottom: 15px; }
+        .form-check-input:checked { background-color: var(--gov-secondary); border-color: var(--gov-secondary); }
+
+        @media (max-width: 768px) {
+            #sidebar-wrapper { margin-left: -260px; position: fixed; height: 100vh; overflow-y: auto; }
+            #wrapper.toggled #sidebar-wrapper { margin-left: 0; }
+            #page-content-wrapper { margin-left: 0 !important; }
+            .top-navbar { margin: 10px; }
+            .pdf-viewer-placeholder { height: 40vh; margin-bottom: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="wrapper">
+        <div id="sidebar-wrapper">
+            <div class="sidebar-brand">
+                <i class="fas fa-shield-halved text-success" style="font-size: 1.5rem; margin-right: 10px;"></i>
+                <span>SIAH Admin</span>
+            </div>
+            <div class="sidebar-nav">
+                <p class="text-uppercase" style="font-size: 0.7rem; color: rgba(255,255,255,0.4); margin: 15px 0 5px 15px; font-weight: 600;">Menu Utama</p>
+                <a href="admin.html" class="nav-item-admin "><i class="fas fa-gauge-high me-2"></i>Dasbor Utama</a>
+                <a href="verifikasi.html" class="nav-item-admin active"><i class="fas fa-file-signature me-2"></i>Verifikasi Usulan</a>
+                <a href="arsip_data.html" class="nav-item-admin"><i class="fas fa-archive me-2"></i>Arsip Data Bulanan</a>
+                <a href="arsip_sk.html" class="nav-item-admin "><i class="fas fa-file-pdf me-2"></i>Arsip SK Kecamatan</a>
+                <!-- <p class="text-uppercase" style="font-size: 0.7rem; color: rgba(255,255,255,0.4); margin: 25px 0 5px 15px; font-weight: 600;">Pengaturan</p> -->
+
+                <div class="mt-5 px-3">
+                    <a href="login.html" class="btn btn-outline-light w-100" style="border-radius: 12px; opacity: 0.8;"><i class="fas fa-sign-out-alt me-2"></i>Keluar / Logout</a>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-content-wrapper">
+            <nav class="navbar top-navbar d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <button type="button" class="btn-toggle me-3" onclick="document.getElementById('wrapper').classList.toggle('toggled');">
+                        <i class="fas fa-bars fa-lg" style="pointer-events: none;"></i>
+                    </button>
+                    <h5 class="m-0 fw-bold d-none d-sm-block text-dark">Manajemen & Progres Usulan</h5>
+                </div>
+                
+                <div class="d-flex align-items-center gap-2 pe-2 border-start ms-2 ps-3">
+                    <div class="dropdown me-3">
+                        <button class="btn bg-light border-0 position-relative p-2 rounded-circle shadow-sm" type="button" id="dropdownAdminNotif" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-bell text-secondary fs-5"></i>
+                            <span id="adminNotifBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none" style="font-size: 0.65rem;">0</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 dropdown-menu-notif mt-2" aria-labelledby="dropdownAdminNotif" id="adminNotifList">
+                            <li><span class="dropdown-item text-center text-muted py-4 small">Tidak ada antrean baru</span></li>
+                        </ul>
+                    </div>
+
+                    <div class="text-end me-2 d-none d-md-block">
+                        <span class="d-block fw-bold text-dark" style="font-size: 0.9rem;">Admin DPMD</span>
+                        <span class="text-muted" style="font-size: 0.75rem;">Kabupaten Malang</span>
+                    </div>
+                    <div class="rounded-3 shadow-sm d-flex align-items-center justify-content-center fw-bold text-white" style="width: 42px; height: 42px; background-color: var(--gov-secondary); font-size: 1.2rem;">AD</div>
+                </div>
+            </nav>
+
+            <div class="container-fluid px-4 py-3">
+                <div class="mb-4">
+                    <h4 class="fw-bold text-dark m-0">Antrean & Progres Usulan</h4>
+                    <p class="text-muted small">Kelola verifikasi berkas awal hingga SK Perangkat Desa diterbitkan.</p>
+                </div>
+
+                <div class="filter-panel">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-5">
+                            <label class="form-label small fw-semibold text-muted">Layanan</label>
+                            <select id="filterLayanan" class="form-select border-0 bg-light">
+                                <option value="">Semua Layanan</option>
+                                <option value="pengangkatan">Pengangkatan</option>
+                                <option value="pemberhentian">Pemberhentian</option>
+                                <option value="mutasi">Mutasi</option>
+                            </select>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label small fw-semibold text-muted">Cari Desa / Tiket</label>
+                            <input type="text" id="inputCari" class="form-control border-0 bg-light" placeholder="Ketik kata kunci...">
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-success w-100 rounded-3" onclick="jalankanFilter()"><i class="fas fa-filter me-2"></i>Terapkan</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-card">
+                    <div class="table-responsive" style="background: var(--bg-body); padding: 15px; border-radius: 15px;">
+                        <table class="table text-center m-0">
+                            <thead>
+                                <tr>
+                                    <th class="text-start ps-3">No. Tiket</th>
+                                    <th>Kategori</th>
+                                    <th>Asal Instansi</th>
+                                    <th>Status Berkas</th>
+                                    <th>Tgl Masuk</th>
+                                    <th>Aksi Lanjutan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelData">
+                                <tr>
+                                    <td colspan="6" class="py-5 text-center text-muted">
+                                        <i class="fas fa-spinner fa-spin fs-2 mb-3 text-success"></i><br>
+                                        Memuat data antrean dari database...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalVerifikasi" tabindex="-1" data-bs-backdrop="static" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-xl-custom modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 15px; overflow: hidden;">
+                <div class="modal-header text-white" style="background-color: var(--gov-primary);">
+                    <h5 class="modal-title fw-bold">
+                        <i class="fas fa-file-signature me-2"></i> Panel Verifikasi & Progres 
+                        <span class="badge bg-light text-dark ms-2" id="modalTicket">#USL-000</span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                
+                <div class="modal-body p-0">
+                    <div class="row g-0">
+                        <div class="col-lg-7 p-4 bg-light border-end d-flex flex-column">
+                            <h6 class="fw-bold mb-3 text-dark"><i class="fas fa-file-pdf text-danger me-2"></i>Pratinjau Dokumen (.PDF)</h6>
+                            <div class="pdf-viewer-placeholder flex-grow-1" id="pdfViewerArea"></div>
+                        </div>
+
+                        <div class="col-lg-5 p-4 d-flex flex-column" style="max-height: 80vh; overflow-y: auto;">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <h5 class="fw-bold m-0" id="modalDesa">Nama Desa</h5>
+                                    <span class="badge-soft-success mt-1" id="modalKategori">Kategori Layanan</span>
+                                    <div class="mt-2 text-primary fw-bold small" id="modalCurrentStatusLabel">Status: Menunggu Verifikasi</div>
+                                    
+                                    <!-- Area Notif Serah Terima -->
+                                    <div id="infoPengambilSurat" style="display: none;"></div>
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <div id="areaVerifikasiAwal">
+                                <h6 class="fw-bold text-dark mb-3"><i class="fas fa-tasks text-success me-2"></i>Checklist Persyaratan Fisik</h6>
+                                <div class="checklist-box">
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input shadow-sm" type="checkbox" id="check1" onchange="periksaChecklist()">
+                                        <label class="form-check-label text-dark small fw-medium" for="check1">Surat Pengantar & Kades Tembusan DPMD</label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input shadow-sm" type="checkbox" id="check2" onchange="periksaChecklist()">
+                                        <label class="form-check-label text-dark small fw-medium" for="check2">Rekomendasi Camat (Asli/Sesuai)</label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input shadow-sm" type="checkbox" id="check3" onchange="periksaChecklist()">
+                                        <label class="form-check-label text-dark small fw-medium" for="check3">Kelengkapan Administrasi (KTP/KK/Ijazah)</label>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold text-dark small mb-2"><i class="fas fa-balance-scale me-1"></i> Keputusan Verifikasi DPMD:</label>
+                                    <div class="d-flex gap-2">
+                                        <input type="radio" class="btn-check" name="keputusan" id="btnSetuju" autocomplete="off" onchange="toggleKeputusan()" disabled>
+                                        <label class="btn btn-outline-success btn-sm flex-fill fw-bold py-2" for="btnSetuju" id="labelSetuju"><i class="fas fa-check me-1"></i> Setuju</label>
+
+                                        <input type="radio" class="btn-check" name="keputusan" id="btnRevisi" autocomplete="off" onchange="toggleKeputusan()">
+                                        <label class="btn btn-outline-warning text-dark btn-sm flex-fill fw-bold py-2" for="btnRevisi"><i class="fas fa-edit me-1"></i> Revisi</label>
+
+                                        <input type="radio" class="btn-check" name="keputusan" id="btnTolak" autocomplete="off" onchange="toggleKeputusan()">
+                                        <label class="btn btn-outline-danger btn-sm flex-fill fw-bold py-2" for="btnTolak"><i class="fas fa-times me-1"></i> Tolak</label>
+                                    </div>
+                                    <div id="hintSetuju" class="text-danger small mt-2 fw-medium"><i class="fas fa-info-circle me-1"></i> *Wajib mencentang ke-3 syarat fisik di atas untuk Setuju.</div>
+                                </div>
+
+                                <div id="areaRevisi" class="mb-3 p-3 bg-warning bg-opacity-10 border border-warning rounded" style="display: none;">
+                                    <label class="form-label fw-bold text-dark small mb-2"><i class="fas fa-clipboard-list me-1"></i> Kekurangan Berkas Administrasi:</label>
+                                    <textarea id="catatanRevisi" class="form-control form-control-sm bg-white mt-2" rows="3" placeholder="Sebutkan detail dokumen yang harus diperbaiki oleh desa..."></textarea>
+                                </div>
+
+                                <div id="areaTolak" class="mb-3 p-3 bg-danger bg-opacity-10 border border-danger rounded" style="display: none;">
+                                    <label class="form-label fw-bold text-danger small mb-2"><i class="fas fa-exclamation-triangle me-1"></i> Alasan Penolakan (Cacat Hukum):</label>
+                                    <textarea id="catatanTolak" class="form-control form-control-sm bg-white border-danger shadow-sm" rows="3" placeholder="Jelaskan alasan penolakan sesuai regulasi (Wajib diisi)..."></textarea>
+                                </div>
+
+                                <div class="mt-auto pt-3 border-top">
+                                    <button type="button" class="btn btn-primary w-100 fw-bold py-2 shadow-sm" onclick="simpanKeputusan()">
+                                        <i class="fas fa-paper-plane me-2"></i> Kirim
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div id="areaProgresLanjutan" class="mt-2 p-3 bg-light rounded border" style="display: none;">
+                                <label class="form-label text-primary fw-bold mb-3"><i class="fas fa-rocket me-1"></i> Kawal Progres Usulan</label>
+                                
+                                <div id="stepProsesBupati" style="display: none;">
+                                    <div class="alert alert-primary small border-primary mb-3">
+                                        <i class="fas fa-info-circle me-1"></i> Berkas fisik telah diverifikasi. Lanjutkan status ini jika berkas sudah diajukan ke meja Bupati.
+                                    </div>
+                                    <button type="button" class="btn btn-primary fw-bold w-100 shadow-sm py-2" onclick="updateProgres('Proses Bupati', 'Berkas fisik telah diterima. Saat ini berkas sedang dalam pengajuan dan diproses oleh Bupati.')">
+                                        <i class="fas fa-paper-plane me-2"></i> Ajukan ke Bupati
+                                    </button>
+                                </div>
+
+                                <div id="stepRekomTurun" style="display: none;">
+                                    <div class="alert alert-info small border-info mb-3">
+                                        <i class="fas fa-info-circle me-1"></i> Surat sedang diproses. Klik tombol di bawah jika Surat Rekomendasi sudah turun/selesai.
+                                    </div>
+                                    <button type="button" class="btn btn-info text-dark fw-bold w-100 shadow-sm py-2" onclick="updateProgres('Rekomendasi Turun', 'Surat rekomendasi Bupati sudah turun. Silakan ambil dokumen fisik ke kantor DPMD.')">
+                                        <i class="fas fa-envelope-open-text me-2"></i> Surat Rekomendasi Turun
+                                    </button>
+                                </div>
+
+                                <div id="stepFormPengambilan" style="display: none;">
+                                    <div class="alert alert-warning small border-warning py-2 mb-3">
+                                        <i class="fas fa-exclamation-triangle me-1"></i> Form ini digunakan oleh Admin untuk menginput data jika perwakilan Desa <b>datang ke kantor DPMD</b> untuk mengambil surat fisik.
+                                    </div>
+                                    <div class="bg-white border rounded shadow-sm p-3">
+                                        <h6 class="fw-bold text-dark mb-2 small text-uppercase"><i class="fas fa-handshake me-2 text-warning"></i>Data Serah Terima Surat</h6>
+                                        <hr class="mt-1 mb-3">
+                                        
+                                        <div class="mb-2">
+                                            <label class="form-label small fw-bold mb-1">Nama Penerima (Pihak Desa)</label>
+                                            <input type="text" id="adminNamaPenerima" class="form-control form-control-sm" placeholder="Contoh: Bpk. Ahmad (Kades/Perangkat)">
+                                        </div>
+                                        <div class="mb-2">
+                                            <label class="form-label small fw-bold mb-1">Jabatan Penerima</label>
+                                            <input type="text" id="adminJabatanPenerima" class="form-control form-control-sm" placeholder="Contoh: Kasi Pemerintahan">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-bold mb-1">Tanggal Pengambilan di DPMD</label>
+                                            <input type="date" id="adminTglAmbil" class="form-control form-control-sm">
+                                        </div>
+                                        
+                                        <button class="btn btn-dark btn-sm w-100 fw-bold shadow-sm py-2 mt-2" onclick="prosesUpdateAmbilAdmin()">
+                                            <i class="fas fa-check-circle me-1"></i> Simpan Data & Instruksikan Upload SK
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div id="stepMenungguSK" style="display: none;">
+                                    <div class="alert alert-secondary border-secondary small mb-3 fw-medium">
+                                        <i class="fas fa-clock me-2"></i> Surat Rekomendasi telah diambil. Saat ini sistem sedang menunggu pihak Desa mengunggah file SK.
+                                    </div>
+                                    
+                                    <div class="bg-white border rounded shadow-sm p-3 border-start border-4 border-primary">
+                                        <h6 class="fw-bold text-dark mb-2 small text-uppercase"><i class="fas fa-life-ring me-2 text-primary"></i>Bantu Desa Upload SK</h6>
+                                        <p class="small text-muted mb-2" style="font-size: 0.75rem;">Jika pihak desa sibuk/terkendala sinyal, Admin dapat membantu mengunggah file PDF Surat Keputusan (SK) di sini untuk menyelesaikan proses.</p>
+                                        <input type="file" class="form-control form-control-sm mb-2" id="fileSKAdmin" accept="application/pdf">
+                                        <button class="btn btn-primary btn-sm w-100 fw-bold shadow-sm" onclick="prosesAdminUploadSK()">
+                                            <i class="fas fa-cloud-upload-alt me-1"></i> Upload SK & Selesaikan
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div id="stepSKDiunggah" style="display: none;">
+                                    <div class="alert alert-success small border-success mb-3">
+                                        <i class="fas fa-check-double me-1"></i> Desa telah mengunggah SK. Silakan periksa file SK di sebelah kiri. Jika sudah sesuai, klik tombol Selesai untuk mengarsipkan dokumen.
+                                    </div>
+                                    <button type="button" class="btn btn-success text-white fw-bold w-100 shadow-sm py-2" onclick="updateProgres('Selesai', 'Proses pengajuan telah SELESAI. Arsip SK telah masuk ke Direktori DPMD.')">
+                                        <i class="fas fa-flag-checkered me-2"></i> Proses Pengajuan Selesai
+                                    </button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        // URL DAN KUNCI ASLI YANG 100% VALID
+        const _supabaseUrl = 'https://trkppiiwtsanrkhfssbi.supabase.co'; 
+        const _supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRya3BwaWl3dHNhbnJraGZzc2JpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyMDQ2MjMsImV4cCI6MjA5Mzc4MDYyM30.3FXToAhNzMX7Bf73YHFL8TEsovp5Mt6qk-M2Fs0OVqo';                
+        
+        const supabaseClient = window.supabase.createClient(_supabaseUrl, _supabaseKey, {
+            auth: { persistSession: false }
+        });
+
+        document.getElementById('dropdownAdminNotif').addEventListener('click', function() {
+            document.getElementById('adminNotifBadge').classList.add('d-none');
+        });
+
+        let currentUsulanId = null;
+        let currentUrlPengantar = '';
+        let currentUrlSyarat = '';
+        let currentUrlSK = '';
+        let currentStatusData = '';
+        let myModalInstance = null;
+
+        async function muatDaftarAntrean() {
+            const tbody = document.getElementById('tabelData');
+            
+            // Cara "Bulletproof": Kita sambung perintah .neq (Not Equal)
+            const { data, error } = await supabaseClient
+                .from('usulan')
+                .select('*')
+                .neq('status', 'Ditolak') // Filter 1: Bukan Ditolak
+                .neq('status', 'Selesai') // Filter 2: Bukan Selesai
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                tbody.innerHTML = `<tr><td colspan="6" class="py-4 text-danger text-center">Gagal menarik data: ${error.message}</td></tr>`;
+                return;
+            }
+
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="py-5 text-muted"><i class="fas fa-clipboard-check fs-2 mb-2 d-block"></i> Semua antrean bersih! Tidak ada berkas yang perlu diproses.</td></tr>`;
+                document.getElementById('adminNotifBadge').classList.add('d-none');
+                return;
+            }
+
+            tbody.innerHTML = ''; 
+            
+            let countMenunggu = 0;
+            let notifHTML = '';
+
+            data.forEach(item => {
+                const dateObj = new Date(item.created_at);
+                const tgl = dateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+                const jam = dateObj.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                
+                const safeCatatan = item.catatan_admin ? item.catatan_admin.replace(/'/g, "\\'").replace(/"/g, '&quot;') : '';
+
+                // --- LOGIKA BARU: EKSTRAK NAMA UNTUK DITAMPILKAN LANGSUNG DI TABEL ---
+                let namaPengambilHtml = '';
+                if (item.catatan_admin && item.catatan_admin.toLowerCase().includes('oleh:')) {
+                    // Mengambil teks di antara kata "oleh:" dan "pada tanggal"
+                    let match = item.catatan_admin.match(/oleh:\s*(.*?)(?:\s*pada tanggal|\.)/i);
+                    if (match && match[1]) {
+                        namaPengambilHtml = `
+                            <div class="mt-2">
+                                <span class="badge bg-light text-dark border border-secondary shadow-sm" style="font-size: 0.7rem;">
+                                    <i class="fas fa-user-check text-success me-1"></i> Penerima: ${match[1]}
+                                </span>
+                            </div>
+                        `;
+                    }
+                }
+                // ---------------------------------------------------------------------
+
+                let badgeKategori = 'badge-soft-success';
+                if (item.jenis_layanan && item.jenis_layanan.toLowerCase().includes('berhenti')) badgeKategori = 'badge-soft-danger';
+                if (item.jenis_layanan && item.jenis_layanan.toLowerCase().includes('mutasi')) badgeKategori = 'badge-soft-warning';
+
+                let badgeStatus = `<span class="badge bg-secondary">${item.status}</span>`;
+                if(item.status === 'Menunggu Verifikasi') {
+                    badgeStatus = `<span class="badge bg-danger text-white px-3"><i class="fas fa-times-circle me-1"></i> Belum Verifikasi</span>`;
+                    countMenunggu++;
+                    notifHTML += `
+                        <a class="dropdown-item dropdown-item-notif" href="#" onclick="bukaModalVerifikasi('${item.id}', '${item.desa}', '${item.jenis_layanan}', '${item.surat_pengantar_url || ''}', '${item.berkas_persyaratan_url || ''}', '${item.sk_url || ''}', '${item.status}', '${safeCatatan}')">
+                            <div class="d-flex">
+                                <i class="fas fa-file-signature text-danger fs-4 mt-1 me-3"></i>
+                                <div>
+                                    <p class="mb-0 fw-bold small text-dark">Usulan Baru: Ds. ${item.desa}</p>
+                                    <p class="mb-0 small text-muted mt-1" style="line-height:1.2;">Layanan: ${item.jenis_layanan}</p>
+                                </div>
+                            </div>
+                        </a>
+                    `;
+                }
+                else if(item.status === 'Terverifikasi') badgeStatus = `<span class="badge bg-primary px-3"><i class="fas fa-check-circle me-1"></i> Disetujui DPMD</span>`;
+                else if(item.status === 'Proses Bupati') badgeStatus = `<span class="badge bg-primary px-3"><i class="fas fa-paper-plane me-1"></i> Proses Bupati</span>`;
+                else if(item.status === 'Rekomendasi Turun') badgeStatus = `<span class="badge bg-info text-dark px-3"><i class="fas fa-envelope-open me-1"></i> Rekom Turun</span>`;
+                else if(item.status === 'Sudah Diambil') badgeStatus = `<span class="badge bg-dark text-white px-3"><i class="fas fa-upload me-1"></i> Tunggu SK</span>`;
+                else if(item.status === 'Revisi') badgeStatus = `<span class="badge bg-warning text-dark px-3"><i class="fas fa-user-edit me-1"></i> Menunggu Revisi Desa</span>`;
+                else if(item.status === 'SK Diunggah') badgeStatus = `<span class="badge bg-success text-white px-3"><i class="fas fa-file-pdf me-1"></i> SK Diunggah</span>`;
+
+                // --- LOGIKA TOMBOL AKSI ---
+                // --- LOGIKA TOMBOL AKSI ---
+                let actionButton = '';
+
+                if (item.status === 'Selesai') {
+                    // Tombol penanda proses berakhir (disabled)
+                    actionButton = `
+                        <button class="btn btn-outline-success btn-sm fw-bold rounded-pill px-3 shadow-none" disabled>
+                            <i class="fas fa-check-double me-1"></i> Selesai
+                        </button>
+                    `;
+                } else if (item.status === 'Revisi') {
+                    actionButton = `<button class="btn btn-secondary text-white btn-sm fw-bold rounded-pill px-3 shadow-sm" disabled><i class="fas fa-clock me-1"></i> Menunggu Desa</button>`;
+                } else {
+                    // Logika untuk status lainnya (Menunggu, Terverifikasi, dll)
+                    const isBelumVerifikasi = (item.status === 'Menunggu Verifikasi');
+                    let btnWarna = isBelumVerifikasi ? 'danger' : 'primary';
+                    let btnTeks = isBelumVerifikasi ? 'Verifikasi' : 'Update Progres';
+                    let btnIkon = isBelumVerifikasi ? 'fa-magnifying-glass-chart' : 'fa-arrow-right';
+
+                    if(item.status === 'SK Diunggah') {
+                        btnWarna = 'success';
+                        btnTeks = 'Selesaikan';
+                        btnIkon = 'fa-flag-checkered';
+                    }
+
+                    actionButton = `
+                        <button class="btn btn-${btnWarna} text-white btn-sm fw-bold rounded-pill px-3 shadow-sm" 
+                            onclick="bukaModalVerifikasi('${item.id}', '${item.desa}', '${item.jenis_layanan}', '${item.surat_pengantar_url || ''}', '${item.berkas_persyaratan_url || ''}', '${item.sk_url || ''}', '${item.status}', '${safeCatatan}')">
+                            <i class="fas ${btnIkon} me-1"></i> ${btnTeks}
+                        </button>
+                    `;
+                }
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="text-start ps-3 fw-bold text-dark">#USL-${item.id.toString().substring(0,6).toUpperCase()}</td>
+                    <td><span class="${badgeKategori}">${item.jenis_layanan}</span></td>
+                    <td><span class="fw-semibold text-dark">Ds. ${item.desa || '-'}</span><br><small class="text-muted">Kec. ${item.kecamatan || '-'}</small></td>
+                    <!-- Menampilkan Badge Status DAN Info Penerima secara bersamaan -->
+                    <td>${badgeStatus}${namaPengambilHtml}</td>
+                    <td><span class="text-dark">${tgl}</span><br><small class="text-muted">${jam} WIB</small></td>
+                    <td>${actionButton}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            const badgeNotif = document.getElementById('adminNotifBadge');
+            const listNotif = document.getElementById('adminNotifList');
+            if (countMenunggu > 0) {
+                badgeNotif.innerText = countMenunggu;
+                badgeNotif.classList.remove('d-none');
+                listNotif.innerHTML = `<li class="dropdown-header fw-bold text-dark border-bottom pb-2">Ada ${countMenunggu} Pengajuan Baru</li>` + notifHTML;
+            } else {
+                badgeNotif.classList.add('d-none');
+                listNotif.innerHTML = `<li><span class="dropdown-item text-center text-muted py-4 small">Tidak ada antrean baru</span></li>`;
+            }
+        }
+
+
+        // FUNGSI GANTI TAB PDF (VISUAL BUTTON)
+        function gantiTabPdf(btn, url) {
+            document.getElementById('pdfFrame').src = url;
+            const group = btn.parentElement;
+            const buttons = group.querySelectorAll('button');
+            buttons.forEach(b => {
+                b.classList.remove('active', 'btn-light', 'text-dark');
+                b.classList.add('btn-outline-light');
+            });
+            btn.classList.remove('btn-outline-light');
+            btn.classList.add('active', 'btn-light', 'text-dark');
+        }
+
+        // FUNGSI LAYAR PENUH (FULLSCREEN)
+        function fullScreenPdf() {
+            const elem = document.getElementById("pdfFrame");
+            if (elem.requestFullscreen) { elem.requestFullscreen(); } 
+            else if (elem.webkitRequestFullscreen) { elem.webkitRequestFullscreen(); } 
+            else if (elem.msRequestFullscreen) { elem.msRequestFullscreen(); }
+        }
+
+        // FUNGSI UNDUH (DOWNLOAD) PDF
+        function downloadPdf() {
+            const frame = document.getElementById("pdfFrame");
+            let url = frame.src;
+            if (!url) return alert("Dokumen tidak ditemukan!");
+            if (url.includes('?')) { url += '&download='; } else { url += '?download='; }
+            const a = document.createElement('a');
+            a.href = url;
+            a.target = '_blank';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        // FUNGSI ADMIN MENGISI DATA PENGAMBILAN
+        async function prosesUpdateAmbilAdmin() {
+            const nama = document.getElementById('adminNamaPenerima').value;
+            const jabatan = document.getElementById('adminJabatanPenerima').value;
+            const tgl = document.getElementById('adminTglAmbil').value;
+
+            if(!nama || !jabatan || !tgl) return alert("Wajib mengisi Nama Penerima, Jabatan, dan Tanggal Pengambilan secara lengkap!");
+
+            const formattedDate = new Date(tgl).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+            const pesan = `Surat rekomendasi Bupati telah diambil di DPMD oleh: ${nama} (${jabatan}) pada tanggal ${formattedDate}. Silakan buat SK Anda berdasarkan surat tersebut dan segera UPLOAD SK ke sistem.`;
+
+            const btnSave = document.querySelector('#stepFormPengambilan .btn-dark');
+            const teksAsli = btnSave.innerHTML;
+            btnSave.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Menyimpan Data...';
+            btnSave.disabled = true;
+
+            try {
+                const { error } = await supabaseClient
+                    .from('usulan')
+                    .update({ 
+                        status: 'Sudah Diambil', 
+                        catatan_admin: pesan,
+                        nama_penerima: nama,      // Simpan nama langsung ke kolomnya
+                        jabatan_penerima: jabatan, // Simpan jabatan
+                        tgl_ambil: tgl            // Simpan tanggal asli
+                    })
+                    .eq('id', currentUsulanId);
+
+            } catch(err) {
+                alert("Gagal menyimpan data: " + err.message);
+            } finally {
+                btnSave.innerHTML = teksAsli;
+                btnSave.disabled = false;
+            }
+        }
+
+        // FUNGSI ADMIN BANTU UPLOAD SK DESA
+        async function prosesAdminUploadSK() {
+            if (!currentUsulanId) return alert("Pilih usulan dulu!");
+            
+            const fileInput = document.getElementById('fileSKAdmin');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                return alert("Pilih file PDF SK terlebih dahulu!");
+            }
+
+            if (file.type !== "application/pdf") {
+                return alert("File harus berformat PDF!");
+            }
+
+            const konfirmasi = confirm("Anda yakin ingin membantu mengunggah SK ini? Status akan otomatis menjadi SELESAI.");
+            if (!konfirmasi) return;
+
+            const btnSubmit = document.querySelector('#stepMenungguSK .btn-primary');
+            const teksAwal = btnSubmit.innerHTML;
+            btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Mengunggah...';
+            btnSubmit.disabled = true;
+
+            try {
+                // 1. Upload ke Storage
+                const fileExt = file.name.split('.').pop();
+                const fileName = `SK_BantuanAdmin_${currentUsulanId}_${Date.now()}.${fileExt}`;
+
+                const { data: uploadData, error: uploadError } = await supabaseClient.storage
+                    .from('berkas_siah')
+                    .upload(fileName, file);
+
+                if (uploadError) throw uploadError;
+
+                // 2. Dapatkan URL Publik
+                const { data: publicUrlData } = supabaseClient.storage
+                    .from('berkas_siah')
+                    .getPublicUrl(fileName);
+                
+                const skUrl = publicUrlData.publicUrl;
+
+                // 3. Update Tabel (Status langsung 'Selesai')
+                const pesanAdmin = "SK telah diunggah dengan bantuan Admin DPMD. Proses pengajuan telah SELESAI.";
+                const { error: updateError } = await supabaseClient
+                    .from('usulan')
+                    .update({ 
+                        status: 'Selesai', 
+                        sk_url: skUrl,
+                        catatan_admin: pesanAdmin 
+                    })
+                    .eq('id', currentUsulanId);
+
+                if (updateError) throw updateError;
+
+                alert("SUKSES! SK berhasil diunggah oleh Admin. Proses Selesai dan berkas telah diarsipkan.");
+                myModalInstance.hide();
+                muatDaftarAntrean();
+
+            } catch (error) {
+                alert("Gagal mengunggah SK: " + error.message);
+            } finally {
+                btnSubmit.innerHTML = teksAwal;
+                btnSubmit.disabled = false;
+                fileInput.value = ''; // reset input file
+            }
+        }
+
+        function periksaChecklist() {
+            const c1 = document.getElementById('check1').checked;
+            const c2 = document.getElementById('check2').checked;
+            const c3 = document.getElementById('check3').checked;
+            const btnSetuju = document.getElementById('btnSetuju');
+            const hintSetuju = document.getElementById('hintSetuju');
+
+            if (c1 && c2 && c3) {
+                btnSetuju.disabled = false;
+                hintSetuju.style.display = 'none';
+            } else {
+                btnSetuju.disabled = true;
+                if (btnSetuju.checked) {
+                    btnSetuju.checked = false;
+                    toggleKeputusan();
+                }
+                hintSetuju.style.display = 'block';
+            }
+        }
+
+        // Fungsi Modal yang dibuat lebih kuat deteksinya (Broad Search)
+        function bukaModalVerifikasi(id, desa, layanan, urlPengantar, urlSyarat, urlSK, statusTerkini, catatanAdmin = '') {
+            currentUsulanId = id;
+            currentUrlPengantar = urlPengantar;
+            currentUrlSyarat = urlSyarat;
+            currentUrlSK = urlSK;
+            currentStatusData = statusTerkini;
+            
+            document.getElementById('modalTicket').innerText = `#USL-${id.toString().substring(0,6).toUpperCase()}`;
+            document.getElementById('modalDesa').innerText = `Desa ${desa}`;
+            document.getElementById('modalKategori').innerText = layanan;
+            document.getElementById('modalCurrentStatusLabel').innerText = `Status Saat Ini: ${statusTerkini}`;
+
+            const infoPengambil = document.getElementById('infoPengambilSurat');
+            if (catatanAdmin && catatanAdmin.toLowerCase().includes('diambil')) {
+                const textInfoSerahTerima = catatanAdmin.split('. Silakan')[0]; 
+                infoPengambil.innerHTML = `
+                    <div class="alert alert-success p-2 mt-2 mb-0 border-success shadow-sm" style="font-size: 0.8rem; background-color: #f0fdf4;">
+                        <i class="fas fa-handshake text-success me-1"></i> <strong>Informasi Pengambilan:</strong><br>
+                        <span class="text-dark">${textInfoSerahTerima}</span>
+                    </div>
+                `;
+                infoPengambil.style.display = 'block';
+            } else {
+                infoPengambil.style.display = 'none';
+            }
+
+            // --- Bagian PDF Viewer (Otomatis tampilkan SK jika Selesai) ---
+            const pdfArea = document.getElementById('pdfViewerArea');
+            let tombolTabHTML = '';
+            let defaultPdfSrc = urlPengantar;
+            
+            if ((statusTerkini === 'SK Diunggah' || statusTerkini === 'Selesai') && urlSK) {
+                tombolTabHTML = `
+                    <button class="btn btn-sm btn-outline-light border-0 fw-medium" onclick="gantiTabPdf(this, '${urlPengantar}')"><i class="fas fa-file-pdf me-1 text-danger"></i> Surat Pengantar</button>
+                    <button class="btn btn-sm btn-outline-light border-0 fw-medium" onclick="gantiTabPdf(this, '${urlSyarat}')"><i class="fas fa-file-archive me-1"></i> Syarat Lengkap</button>
+                    <button class="btn btn-sm btn-light text-dark fw-bold border-0 active" onclick="gantiTabPdf(this, '${urlSK}')"><i class="fas fa-file-pdf me-1 text-success"></i> SK Terunggah</button>
+                `;
+                defaultPdfSrc = urlSK; 
+            } else {
+                tombolTabHTML = `
+                    <button class="btn btn-sm btn-light text-dark fw-bold border-0 active" onclick="gantiTabPdf(this, '${urlPengantar}')"><i class="fas fa-file-pdf me-1 text-danger"></i> Surat Pengantar</button>
+                    <button class="btn btn-sm btn-outline-light border-0 fw-medium" onclick="gantiTabPdf(this, '${urlSyarat}')"><i class="fas fa-file-archive me-1"></i> Syarat Lengkap</button>
+                `;
+            }
+
+            pdfArea.innerHTML = `
+                <div class="w-100 bg-dark p-2 d-flex justify-content-between align-items-center rounded-top">
+                    <div class="d-flex gap-2 ms-1">${tombolTabHTML}</div>
+                    <div class="d-flex pe-1">
+                        <button class="btn btn-sm btn-secondary bg-opacity-50 border-0 text-white me-1" onclick="fullScreenPdf()"><i class="fas fa-expand"></i></button>
+                        <button class="btn btn-sm btn-secondary bg-opacity-50 border-0 text-white" onclick="downloadPdf()"><i class="fas fa-download"></i></button>
+                    </div>
+                </div>
+                <iframe id="pdfFrame" src="${defaultPdfSrc}" style="width:100%; height:100%; border:none; flex-grow:1; background:white; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;" allowfullscreen></iframe>
+            `;
+
+            // --- Reset Form ---
+            document.getElementById('btnSetuju').checked = false;
+            document.getElementById('btnRevisi').checked = false;
+            document.getElementById('btnTolak').checked = false;
+            document.querySelectorAll('.checklist-box input[type="checkbox"]').forEach(cb => cb.checked = false);
+            
+            // --- Logika Tampilan Berdasarkan Status ---
+            const areaAwal = document.getElementById('areaVerifikasiAwal');
+            const areaLanjutan = document.getElementById('areaProgresLanjutan');
+            
+            areaAwal.style.display = 'none';
+            areaLanjutan.style.display = 'none';
+            document.getElementById('stepProsesBupati').style.display = 'none';
+            document.getElementById('stepRekomTurun').style.display = 'none';
+            document.getElementById('stepFormPengambilan').style.display = 'none';
+            document.getElementById('stepMenungguSK').style.display = 'none';
+            document.getElementById('stepSKDiunggah').style.display = 'none';
+
+            if (statusTerkini === 'Menunggu Verifikasi') {
+                areaAwal.style.display = 'block';
+            } 
+            else if (statusTerkini === 'Selesai') {
+                // Tampilkan pesan SELESAI daripada form input
+                areaLanjutan.style.display = 'block';
+                areaLanjutan.innerHTML = `
+                    <div class="alert alert-success border-success text-center py-4 shadow-sm" style="border-radius: 15px; background-color: #f0fdf4;">
+                        <i class="fas fa-check-circle fa-3x mb-3 text-success"></i>
+                        <h6 class="fw-bold text-dark">PROSES SELESAI</h6>
+                        <p class="small text-muted m-0 px-3">Seluruh tahapan administrasi telah selesai. Berkas SK telah diarsipkan secara digital dalam database DPMD.</p>
+                    </div>
+                `;
+            }
+            else {
+                areaLanjutan.style.display = 'block';
+                if (statusTerkini === 'Terverifikasi') document.getElementById('stepProsesBupati').style.display = 'block';
+                else if (statusTerkini === 'Proses Bupati') document.getElementById('stepRekomTurun').style.display = 'block';
+                else if (statusTerkini === 'Rekomendasi Turun') {
+                    document.getElementById('stepFormPengambilan').style.display = 'block';
+                    document.getElementById('adminTglAmbil').valueAsDate = new Date();
+                } 
+                else if (statusTerkini === 'Sudah Diambil') document.getElementById('stepMenungguSK').style.display = 'block';
+                else if (statusTerkini === 'SK Diunggah') document.getElementById('stepSKDiunggah').style.display = 'block';
+            }
+
+            if (!myModalInstance) {
+                myModalInstance = new bootstrap.Modal(document.getElementById('modalVerifikasi'));
+            }
+            myModalInstance.show();
+        }
+
+        function toggleKeputusan() {
+            document.getElementById('areaRevisi').style.display = document.getElementById('btnRevisi').checked ? 'block' : 'none';
+            document.getElementById('areaTolak').style.display = document.getElementById('btnTolak').checked ? 'block' : 'none';
+        }
+
+        async function simpanKeputusan() {
+            if (!currentUsulanId) return;
+            let statusBaru = ''; let catatanAdmin = '';
+
+            if (document.getElementById('btnSetuju').checked) {
+                const c1 = document.getElementById('check1').checked;
+                const c2 = document.getElementById('check2').checked;
+                const c3 = document.getElementById('check3').checked;
+                if(!c1 || !c2 || !c3){
+                    alert("Tahan! Anda wajib memeriksa dan mencentang semua kelengkapan fisik berkas."); return;
+                }
+                statusBaru = 'Terverifikasi'; 
+                catatanAdmin = 'Berkas Anda telah diverifikasi dan disetujui. Silakan kirimkan dokumen fisik masing-masing 1 berkas ke DPMD dan Bupati.';
+            } else if (document.getElementById('btnRevisi').checked) {
+                statusBaru = 'Revisi'; catatanAdmin = document.getElementById('catatanRevisi').value;
+            } else if (document.getElementById('btnTolak').checked) {
+                statusBaru = 'Ditolak'; catatanAdmin = document.getElementById('catatanTolak').value;
+            } else {
+                alert('Tindakan Gagal! Anda belum memilih Setuju, Revisi, atau Tolak.'); return;
+            }
+
+            if ((statusBaru === 'Revisi' || statusBaru === 'Ditolak') && catatanAdmin.trim() === '') {
+                alert('Alasan Penolakan/Revisi WAJIB diisi agar desa mengerti penyebabnya!'); return;
+            }
+
+            const btnSubmit = document.querySelector('.btn-primary[onclick="simpanKeputusan()"]');
+            const teksAwal = btnSubmit.innerHTML;
+            btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Memproses...';
+            btnSubmit.disabled = true;
+
+            try {
+                let payload = { status: statusBaru, catatan_admin: catatanAdmin };
+
+                // Jika Revisi/Tolak hapus file di storage agar desa unggah ulang
+                if (statusBaru === 'Revisi' || statusBaru === 'Ditolak') {
+                    const filesToDelete = [];
+                    if (currentUrlPengantar) {
+                        const path1 = currentUrlPengantar.split('/berkas_siah/')[1];
+                        if (path1) filesToDelete.push(path1);
+                    }
+                    if (currentUrlSyarat && currentUrlSyarat !== currentUrlPengantar) {
+                        const path2 = currentUrlSyarat.split('/berkas_siah/')[1];
+                        if (path2) filesToDelete.push(path2);
+                    }
+                    if (filesToDelete.length > 0) {
+                        await supabaseClient.storage.from('berkas_siah').remove(filesToDelete);
+                    }
+                    payload.surat_pengantar_url = null;
+                    payload.berkas_persyaratan_url = null;
+                }
+
+                const { error } = await supabaseClient.from('usulan').update(payload).eq('id', currentUsulanId);
+                if (error) throw error;
+
+                alert("SUKSES! Berkas telah diberikan keputusan: " + statusBaru);
+                myModalInstance.hide();
+                muatDaftarAntrean();
+
+            } catch (error) {
+                alert("Sistem Error: " + error.message);
+            } finally {
+                btnSubmit.innerHTML = teksAwal;
+                btnSubmit.disabled = false;
+            }
+        }
+
+        async function updateProgres(statusBaru, pesanNotif) {
+            const payload = { 
+                status: statusBaru, 
+                catatan_admin: pesanNotif 
+            };
+
+            // Tambahkan logika pencatatan waktu otomatis
+            if (statusBaru === 'Proses Bupati') {
+                payload.tgl_bupati = new Date().toISOString();
+            } else if (statusBaru === 'Rekomendasi Turun') {
+                payload.tgl_rekom = new Date().toISOString();
+            }
+
+            try {
+                const { error } = await supabaseClient
+                    .from('usulan')
+                    .update(payload)
+                    .eq('id', currentUsulanId);
+
+                if (error) throw error;
+                alert("Status dan waktu progres berhasil dicatat!");
+                myModalInstance.hide();
+                muatDaftarAntrean();
+            } catch (err) {
+                alert("Gagal update: " + err.message);
+            }
+        }
+
+        function jalankanFilter() {
+            const kataKunci = document.getElementById('inputCari').value.toLowerCase();
+            const layanan = document.getElementById('filterLayanan').value.toLowerCase();
+            const barisData = document.querySelectorAll('#tabelData tr');
+
+            barisData.forEach(baris => {
+                if(baris.children.length < 5) return; 
+                const teksBaris = baris.innerText.toLowerCase();
+                const cocokKata = kataKunci === '' || teksBaris.includes(kataKunci);
+                const cocokLayanan = layanan === '' || teksBaris.includes(layanan);
+                baris.style.display = (cocokKata && cocokLayanan) ? '' : 'none';
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', muatDaftarAntrean);
+        
+        // MENGAKTIFKAN FITUR REAL-TIME NOTIFIKASI
+        supabaseClient
+        .channel('tabel_usulan_changes')
+        .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'usulan' },
+            (payload) => {
+                if (typeof muatDaftarAntrean === 'function') muatDaftarAntrean();
+            }
+        )
+        .subscribe();
+    </script>
+</body>
+</html>

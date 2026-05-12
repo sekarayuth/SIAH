@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIAH Kab. Malang - Portal Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gov-primary: #0f4c3a;
+            --gov-secondary: #198754;
+            --bg-light: #f4f7f6;
+            --text-dark: #2c3e50;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, rgba(15, 76, 58, 0.95) 0%, rgba(25, 135, 84, 0.85) 100%), url('https://www.transparenttextures.com/patterns/cubes.png');
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .login-card {
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            overflow: hidden;
+            width: 100%;
+            max-width: 420px;
+            border-top: 5px solid #f39c12;
+        }
+
+        .login-header {
+            text-align: center;
+            padding: 50px 30px 30px;
+        }
+
+        .login-header h4 {
+            font-weight: 700;
+            color: var(--gov-primary);
+            margin-bottom: 5px;
+            font-size: 1.6rem;
+        }
+
+        .login-body {
+            padding: 0 40px 50px;
+        }
+
+        .form-control {
+            background-color: var(--bg-light);
+            border: 1px solid #e0e0e0;
+            padding: 12px 15px;
+            border-radius: 10px;
+        }
+        .form-control:focus { 
+            border-color: var(--gov-secondary); 
+            box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25); 
+            background-color: white; 
+        }
+        .input-group-text { 
+            background-color: var(--gov-primary); 
+            color: white; 
+            border: none; 
+            border-radius: 10px 0 0 10px; 
+        }
+
+        .btn-login {
+            background: linear-gradient(90deg, var(--gov-primary) 0%, var(--gov-secondary) 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        .btn-login:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 8px 15px rgba(25, 135, 84, 0.3); 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container d-flex justify-content-center">
+        <div class="login-card">
+            <div class="login-header">
+                <h4>Portal Login SIAH</h4>
+                <p class="text-muted small">Dinas Pemberdayaan Masyarakat dan Desa</p>
+            </div>
+            
+            <div class="login-body">
+                <form id="loginForm" onsubmit="handleLogin(event)">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small">Alamat Email</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                            <input type="email" class="form-control" id="email" placeholder="nama@email.com" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold small">Kata Sandi</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-key"></i></span>
+                            <input type="password" class="form-control" id="password" placeholder="••••••••" required>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="rememberMe">
+                            <label class="form-check-label small" for="rememberMe">Ingat Saya</label>
+                        </div>
+                        <a href="#" class="text-decoration-none small text-success fw-medium">Lupa Sandi?</a>
+                    </div>
+
+                    <button type="submit" id="btnLogin" class="btn btn-primary w-100 btn-login text-white">
+                        <i class="fas fa-sign-in-alt me-2"></i> MASUK SISTEM
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        // Konfigurasi Supabase
+        const _supabaseUrl = 'https://trkppiiwtsanrkhfssbi.supabase.co'; 
+        const _supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRya3BwaWl3dHNhbnJraGZzc2JpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyMDQ2MjMsImV4cCI6MjA5Mzc4MDYyM30.3FXToAhNzMX7Bf73YHFL8TEsovp5Mt6qk-M2Fs0OVqo';                
+        
+        const supabaseClient = window.supabase.createClient(_supabaseUrl, _supabaseKey);
+
+        async function handleLogin(event) {
+            event.preventDefault(); 
+            
+            const emailInput = document.getElementById('email').value.trim();
+            const passwordInput = document.getElementById('password').value;
+            const btnLogin = document.getElementById('btnLogin');
+            
+            const teksAsli = btnLogin.innerHTML;
+            btnLogin.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Memproses...';
+            btnLogin.disabled = true;
+
+            try {
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email: emailInput,
+                    password: passwordInput,
+                });
+
+                if (error) throw error;
+
+                if (emailInput.toLowerCase() === 'sekarayuth@gmail.com') {
+                    window.location.href = 'admin.html';
+                } else {
+                    window.location.href = 'index.html';
+                }
+
+            } catch (err) {
+                console.error("Error Login:", err.message);
+                alert("Gagal Masuk: " + err.message);
+                btnLogin.innerHTML = teksAsli;
+                btnLogin.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

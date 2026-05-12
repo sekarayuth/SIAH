@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dasbor Utama - Admin SIAH DPMD</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --gov-primary: #0a3622;
+            --gov-secondary: #198754;
+            --bg-body: #f4f7fa;
+            --text-dark: #2b3445;
+        }
+        html { scroll-behavior: smooth; }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+
+        /* --- TATA LETAK & SIDEBAR --- */
+        #wrapper { 
+            display: flex; 
+            width: 100%; 
+            align-items: stretch; 
+            overflow-x: hidden;
+        }
+        #sidebar-wrapper {
+            min-height: 100vh; 
+            width: 260px; 
+            flex-shrink: 0; 
+            background: linear-gradient(180deg, var(--gov-primary) 0%, #061c12 100%);
+            color: white; 
+            transition: margin 0.3s ease-in-out;
+            box-shadow: 4px 0 20px rgba(0,0,0,0.1); 
+            z-index: 1050;
+        }
+        #page-content-wrapper { 
+            min-width: 0; 
+            width: 100%; 
+            transition: margin 0.3s ease-in-out; 
+        }
+        #wrapper.toggled #sidebar-wrapper { margin-left: -260px; }
+
+        .sidebar-brand {
+            padding: 25px 20px; font-size: 1.3rem; font-weight: 800; letter-spacing: 1px;
+            border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center;
+        }
+        .sidebar-nav { padding: 15px 10px; }
+        .nav-item-admin {
+            color: rgba(255,255,255,0.6); padding: 12px 20px; margin-bottom: 5px;
+            border-radius: 12px; display: flex; align-items: center; font-weight: 500;
+            text-decoration: none; transition: all 0.3s ease;
+        }
+        .nav-item-admin:hover { color: white; background: rgba(255,255,255,0.1); transform: translateX(5px); }
+        .nav-item-admin.active {
+            color: white; background: linear-gradient(90deg, var(--gov-secondary) 0%, rgba(25,135,84,0.5) 100%);
+            box-shadow: 0 4px 15px rgba(25,135,84,0.3);
+        }
+        .nav-item-admin i { width: 30px; font-size: 1.1rem; }
+
+        /* --- Navigasi Atas --- */
+        .top-navbar {
+            background: white; 
+            margin: 15px 25px; 
+            border-radius: 15px;
+            padding: 10px 20px; 
+            box-shadow: 0 5px 20px rgba(0,0,0,0.02);
+            position: relative; 
+            z-index: 1040; 
+        }
+        .btn-toggle {
+            background: var(--bg-body); border: none; color: var(--gov-primary);
+            border-radius: 10px; padding: 8px 15px; transition: 0.3s;
+            cursor: pointer; position: relative; z-index: 9999;
+        }
+        .btn-toggle:hover { background: var(--gov-primary); color: white; }
+
+        /* --- Kartu KPI --- */
+        .kpi-card { background: white; border-radius: 15px; padding: 25px; position: relative; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.02); border: none; transition: transform 0.3s; }
+        .kpi-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        .kpi-icon { position: absolute; right: -10px; bottom: -10px; font-size: 5rem; opacity: 0.05; transform: rotate(-15deg); transition: all 0.3s; }
+        .kpi-card:hover .kpi-icon { transform: rotate(0deg) scale(1.1); opacity: 0.1; }
+        
+        .kpi-total .kpi-icon { color: #3498db; }
+        .kpi-pending .kpi-icon { color: #f39c12; }
+        .kpi-success .kpi-icon { color: #27ae60; }
+        .kpi-revisi .kpi-icon { color: #e74c3c; }
+
+        .sla-item { transition: all 0.3s ease; border: 1px solid #edf2f7; }
+        .sla-item:hover { background-color: #fff !important; transform: scale(1.01); box-shadow: 0 5px 15px rgba(0,0,0,0.05) !important; }
+
+        @media (max-width: 991.98px) {
+            #sidebar-wrapper { position: fixed; height: 100vh; overflow-y: auto; margin-left: -260px; }
+            #wrapper.toggled #sidebar-wrapper { margin-left: 0; }
+            .top-navbar { margin: 10px; }
+        }
+
+        /* --- Dropdown Notifikasi (Dari verifikasi.html) --- */
+        .dropdown-menu-notif { width: 320px; border-radius: 15px; max-height: 400px; overflow-y: auto; }
+        .dropdown-item-notif { padding: 12px 20px; border-bottom: 1px solid #f1f1f1; white-space: normal; }
+        .dropdown-item-notif:hover { background-color: #f8f9fa; }
+    </style>
+</head>
+<body>
+    
+    <div id="wrapper">
+        <div id="sidebar-wrapper">
+            <div class="sidebar-brand">
+                <i class="fas fa-shield-halved text-success" style="font-size: 1.5rem; margin-right: 10px;"></i>
+                <span>SIAH Admin</span>
+            </div>
+            <div class="sidebar-nav">
+                <p class="text-uppercase" style="font-size: 0.7rem; color: rgba(255,255,255,0.4); margin: 15px 0 5px 15px; font-weight: 600;">Menu Utama</p>
+                <a href="admin.html" class="nav-item-admin active"><i class="fas fa-gauge-high me-2"></i>Dasbor Utama</a>
+                <a href="verifikasi.html" class="nav-item-admin"><i class="fas fa-file-signature me-2"></i>Verifikasi Usulan</a>
+                <a href="arsip_data.html" class="nav-item-admin"><i class="fas fa-archive me-2"></i>Arsip Data Bulanan</a>
+                <a href="arsip_sk.html" class="nav-item-admin "><i class="fas fa-file-pdf me-2"></i>Arsip SK Kecamatan</a>
+                <!-- <p class="text-uppercase" style="font-size: 0.7rem; color: rgba(255,255,255,0.4); margin: 25px 0 5px 15px; font-weight: 600;">Pengaturan</p> -->
+
+                <div class="mt-5 px-3">
+                    <a href="login.html" class="btn btn-outline-light w-100" style="border-radius: 12px; opacity: 0.8;"><i class="fas fa-sign-out-alt me-2"></i>Keluar / Logout</a>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-content-wrapper">
+            <nav class="navbar top-navbar d-flex justify-content-between align-items-center animate-fade">
+                <div class="d-flex align-items-center">
+                    <button type="button" class="btn-toggle me-3" id="btnSidebarToggle">
+                        <i class="fas fa-bars fa-lg" style="pointer-events: none;"></i>
+                    </button>
+                    <h5 class="m-0 fw-bold d-none d-sm-block text-dark">Ringkasan Sistem</h5>
+                </div>
+                
+                <div class="d-flex align-items-center gap-2 pe-2 border-start ms-2 ps-3">
+                    
+                    <div class="dropdown me-3">
+                        <button class="btn bg-light border-0 position-relative p-2 rounded-circle shadow-sm" type="button" id="dropdownAdminNotif" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-bell text-secondary fs-5"></i>
+                            <span id="adminNotifBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none" style="font-size: 0.65rem;">0</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 dropdown-menu-notif mt-2" aria-labelledby="dropdownAdminNotif" id="adminNotifList">
+                            <li><span class="dropdown-item text-center text-muted py-4 small">Tidak ada antrean baru</span></li>
+                        </ul>
+                    </div>
+
+                    <div class="text-end me-2 d-none d-md-block">
+                        <span class="d-block fw-bold text-dark" style="font-size: 0.9rem;">Admin DPMD</span>
+                        <span class="text-muted" style="font-size: 0.75rem;">Kabupaten Malang</span>
+                    </div>
+                    <div class="rounded-3 shadow-sm d-flex align-items-center justify-content-center fw-bold text-white" style="width: 42px; height: 42px; background-color: var(--gov-secondary); font-size: 1.2rem;">AD</div>
+                    
+                </div>
+            </nav>
+
+            <div class="container-fluid px-4 py-3">
+                <div class="mb-4 animate-fade delay-1">
+                    <h4 class="fw-bold text-dark m-0">Selamat Datang, Admin!</h4>
+                    <p class="text-muted small">Fokus utama hari ini: Selesaikan antrean berkas yang membutuhkan verifikasi.</p>
+                </div>
+
+                <div class="row g-4 mb-4 animate-fade delay-1">
+                    <div class="col-xl-3 col-md-6">
+                        <div class="kpi-card kpi-total">
+                            <h6 class="fw-semibold text-muted mb-1">Total Usulan Masuk</h6>
+                            <h2 id="kpi-total" class="fw-bold text-dark mb-0"><i class="fas fa-spinner fa-spin fs-4"></i></h2>
+                            <i class="fas fa-folder-open kpi-icon"></i>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6">
+                        <div class="kpi-card kpi-pending">
+                            <h6 class="fw-semibold text-muted mb-1">Belum Diverifikasi</h6>
+                            <h2 id="kpi-pending" class="fw-bold text-dark mb-0"><i class="fas fa-spinner fa-spin fs-4"></i></h2>
+                            <i class="fas fa-clock kpi-icon"></i>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6">
+                        <div class="kpi-card kpi-success">
+                            <h6 class="fw-semibold text-muted mb-1">Selesai (SK Terbit)</h6>
+                            <h2 id="kpi-success" class="fw-bold text-dark mb-0"><i class="fas fa-spinner fa-spin fs-4"></i></h2>
+                            <i class="fas fa-check-circle kpi-icon"></i>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6">
+                        <div class="kpi-card kpi-revisi">
+                            <h6 class="fw-semibold text-muted mb-1">Ditolak / Revisi</h6>
+                            <h2 id="kpi-revisi" class="fw-bold text-dark mb-0"><i class="fas fa-spinner fa-spin fs-4"></i></h2>
+                            <i class="fas fa-undo-alt kpi-icon"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4 animate-fade delay-2 pb-4">
+                    <div class="col-12">
+                        <div class="card border-0 shadow-sm" style="border-radius: 20px; border-top: 5px solid var(--gov-primary) !important;">
+                            <div class="card-header bg-white border-bottom-0 pt-4 pb-3 px-4 d-flex justify-content-between align-items-center flex-wrap">
+                                <div>
+                                    <h5 class="fw-bold text-dark m-0">
+                                        <i class="fas fa-business-time text-success me-2"></i>Antrean Menunggu Verifikasi
+                                    </h5>
+                                    <p class="text-muted small m-0 mt-1">Daftar usulan baru dari desa. Urutan paling atas adalah usulan yang paling baru masuk.</p>
+                                </div>
+                            </div>
+                            <div class="card-body px-4 pb-4" id="listUsulanBaru">
+                                <div class="text-center py-5">
+                                    <i class="fas fa-spinner fa-spin text-success fs-1 mb-3"></i>
+                                    <p class="text-muted" id="statusTeks">Sedang mensinkronisasi data dengan server...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        const _supabaseUrl = 'https://trkppiiwtsanrkhfssbi.supabase.co'; 
+        const _supabaseKey = 'sb_publishable_Byr6eUuyMWGPGKnwuqw_Xg_86vR47uZ';
+
+        if (typeof window.supabase === 'undefined') {
+            console.error("Library Supabase tidak termuat!");
+            setUIError("Koneksi ke sistem pusat gagal. Pastikan komputer terhubung ke internet.");
+        } else {
+            const supabase = window.supabase.createClient(_supabaseUrl, _supabaseKey, {
+                auth: { persistSession: false }
+            });
+
+            document.addEventListener('DOMContentLoaded', () => {
+                // Event Lonceng
+                const btnLonceng = document.getElementById('dropdownAdminNotif');
+                if (btnLonceng) {
+                    btnLonceng.addEventListener('click', function() {
+                        document.getElementById('adminNotifBadge').classList.add('d-none');
+                    });
+                }
+
+                // Event Sidebar
+                const menuToggle = document.getElementById("btnSidebarToggle");
+                if (menuToggle) {
+                    menuToggle.addEventListener("click", function(e) {
+                        e.preventDefault();
+                        document.getElementById("wrapper").classList.toggle("toggled");
+                    });
+                }
+                
+                // Panggil data pertama kali
+                initDashboard();
+
+                // Setup Realtime Subscription
+                supabase
+                  .channel('tabel_usulan_changes')
+                  .on('postgres_changes', { event: '*', schema: 'public', table: 'usulan' }, (payload) => {
+                      initDashboard();
+                  })
+                  .subscribe();
+            });
+
+            async function initDashboard() {
+                try {
+                    const { data, error } = await supabase
+                        .from('usulan')
+                        .select('*')
+                        .order('created_at', { ascending: false }); 
+
+                    if (error) throw error;
+                    
+                    const usulanList = data || [];
+
+                    // Hitung KPI
+                    const pending = usulanList.filter(d => d.status === 'Menunggu Verifikasi');
+                    const success = usulanList.filter(d => d.status === 'SK Diunggah' || d.status === 'Selesai');
+                    const revisi = usulanList.filter(d => d.status === 'Ditolak' || d.status === 'Revisi');
+
+                    document.getElementById('kpi-total').innerText = usulanList.length;
+                    document.getElementById('kpi-pending').innerText = pending.length;
+                    document.getElementById('kpi-success').innerText = success.length;
+                    document.getElementById('kpi-revisi').innerText = revisi.length;
+
+                    renderNotifications(pending);
+                    renderSLAQueue(pending);
+
+                } catch(error) {
+                    console.error("Error initDashboard:", error);
+                    setUIError("Terjadi kendala saat menarik data dari database Supabase.");
+                }
+            }
+
+            function setUIError(pesanError) {
+                document.getElementById('kpi-total').innerText = "0";
+                document.getElementById('kpi-pending').innerText = "0";
+                document.getElementById('kpi-success').innerText = "0";
+                document.getElementById('kpi-revisi').innerText = "0";
+
+                document.getElementById('listUsulanBaru').innerHTML = `
+                    <div class="text-center py-5 text-danger">
+                        <i class="fas fa-exclamation-triangle fs-1 mb-3"></i>
+                        <h5>Gagal Sinkronisasi Data!</h5>
+                        <p class="small text-muted">${pesanError}</p>
+                    </div>`;
+            }
+
+            function renderNotifications(pendingData) {
+                const badgeNotif = document.getElementById('adminNotifBadge');
+                const listNotif = document.getElementById('adminNotifList');
+                
+                if (pendingData.length > 0) {
+                    badgeNotif.classList.remove('d-none');
+                    badgeNotif.innerText = pendingData.length;
+                    
+                    let notifHTML = '';
+                    pendingData.slice(0, 5).forEach(item => {
+                        notifHTML += `
+                            <li>
+                                <a class="dropdown-item dropdown-item-notif" href="verifikasi.html">
+                                    <div class="d-flex">
+                                        <i class="fas fa-file-signature text-danger fs-4 mt-1 me-3"></i>
+                                        <div>
+                                            <p class="mb-0 fw-bold small text-dark">Usulan Baru: Ds. ${item.desa || '-'}</p>
+                                            <p class="mb-0 small text-muted mt-1" style="line-height:1.2;">Layanan: ${item.jenis_layanan || 'Pengajuan'}</p>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                        `;
+                    });
+
+                    listNotif.innerHTML = `<li><h6 class="dropdown-header fw-bold text-dark border-bottom pb-2">Ada ${pendingData.length} Pengajuan Baru</h6></li>` + notifHTML;
+                } else {
+                    badgeNotif.classList.add('d-none');
+                    listNotif.innerHTML = `<li><span class="dropdown-item text-center text-muted py-4 small">Tidak ada antrean baru</span></li>`;
+                }
+            }
+
+            function renderSLAQueue(pendingData) {
+                const listContainer = document.getElementById('listUsulanBaru');
+                
+                if (pendingData.length === 0) {
+                    listContainer.innerHTML = `
+                        <div class="text-center py-5 text-muted">
+                            <i class="fas fa-check-circle fs-1 mb-3 text-success d-block"></i> 
+                            <h5 class="fw-bold">Antrean Bersih!</h5>
+                            <p>Semua usulan telah selesai diverifikasi.</p>
+                        </div>`;
+                    return;
+                }
+
+                listContainer.innerHTML = '';
+                
+                pendingData.forEach(item => {
+                    const createdDate = new Date(item.created_at);
+                    const tglFormat = createdDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+                    const diffTime = Math.abs(new Date() - createdDate);
+                    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+                    let slaColor = '#3498db'; let slaBadge = 'BARU MASUK'; let badgeColor = 'bg-info';
+                    
+                    if (diffDays >= 3) { 
+                        slaColor = '#e74c3c'; slaBadge = 'MENGANTRE LAMA'; badgeColor = 'bg-danger'; 
+                    } else if (diffDays >= 1) { 
+                        slaColor = '#f39c12'; slaBadge = 'HARI KE-' + diffDays; badgeColor = 'bg-warning text-dark'; 
+                    }
+
+                    listContainer.innerHTML += `
+                        <div class="sla-item d-flex align-items-center p-3 mb-3 bg-light rounded-4 shadow-sm" style="border-left: 6px solid ${slaColor} !important;">
+                            <div class="px-3 text-center border-end" style="min-width: 100px;">
+                                <div class="fw-bold fs-6 mb-0 text-dark">${tglFormat}</div>
+                                <small class="text-muted fw-bold" style="font-size: 0.65rem;">TGL MASUK</small>
+                            </div>
+                            <div class="flex-grow-1 ps-4">
+                                <div class="d-flex align-items-center mb-1">
+                                    <h6 class="fw-bold m-0 text-dark">Desa ${item.desa || '-'}</h6>
+                                    <span class="badge ${badgeColor} ms-3 px-2 py-1" style="font-size: 0.6rem;">${slaBadge}</span>
+                                </div>
+                                <p class="m-0 text-muted small"><i class="fas fa-file-alt me-1"></i> ${item.jenis_layanan || '-'}</p>
+                            </div>
+                            <div class="text-end">
+                                <a href="verifikasi.html" class="btn text-white fw-bold rounded-pill px-4 py-2 shadow-sm" style="background-color: ${slaColor}; font-size: 0.8rem;">
+                                    Buka Panel Verifikasi <i class="fas fa-chevron-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>`;
+                });
+            }
+        }
+    </script>
+</body>
+</html>
