@@ -144,8 +144,12 @@
             const passwordInput = document.getElementById('password').value;
             const btnLogin = document.getElementById('btnLogin');
             
-            // Menggunakan domain siah.id sebagai identitas internal database
-            const dummyEmail = `${usernameInput}@siah.id`; 
+            // --- BAGIAN YANG DIGANTI ---
+            let emailToAuth = usernameInput.toLowerCase();
+            if (!emailToAuth.includes('@')) {
+                emailToAuth += '@siah.id';
+            }
+            // ----------------------------
 
             const teksAsli = btnLogin.innerHTML;
             btnLogin.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Memproses...';
@@ -153,15 +157,13 @@
 
             try {
                 const { data, error } = await supabaseClient.auth.signInWithPassword({
-                    email: dummyEmail, 
+                    email: emailToAuth, 
                     password: passwordInput,
                 });
 
                 if (error) throw error;
 
-                // Logika pengalihan halaman
-                // Jika username adalah 'admindpmd', maka email di sistem adalah 'admindpmd@siah.id'
-                if (usernameInput.toLowerCase() === 'admindpmd') {
+                if (emailToAuth === 'admindpmd@siah.id') {
                     window.location.href = 'admin.html';
                 } else {
                     window.location.href = 'dashboard.html'; 
