@@ -60,7 +60,6 @@
         .btn-toggle:hover { background: var(--gov-primary); color: white; }
 
         /* --- Styling Timeline Tracking --- */
-        /* --- FINAL ENHANCED TIMELINE UI (Gunakan ini saja) --- */
         .tracking-list { 
             position: relative; 
             padding: 20px 5px; 
@@ -69,13 +68,12 @@
 
         .timeline-item {
             padding-left: 35px;
-            border-left: 3px solid #dee2e6; /* Garis default abu-abu */
+            border-left: 3px solid #dee2e6;
             position: relative;
             padding-bottom: 30px;
             transition: all 0.3s ease;
         }
 
-        /* Lingkaran Ikon (Pas di tengah garis) */
         .timeline-icon {
             position: absolute;
             left: -17.5px; 
@@ -93,7 +91,6 @@
             border: 2px solid currentColor;
         }
 
-        /* Kotak Detail Pengambil */
         .info-box-pengambil {
             background-color: #f8f9fa;
             border-radius: 12px;
@@ -103,12 +100,10 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
 
-        /* Warna Garis kalau status aktif (Hijau) */
         .timeline-item.border-success {
             border-left: 3px solid var(--gov-secondary) !important;
         }
 
-        /* Menghilangkan garis di item paling bawah */
         .timeline-item:last-child { 
             border-left: 3px solid transparent !important; 
         }
@@ -243,12 +238,10 @@
                 const { data, error } = await supabaseClient
                     .from('usulan')
                     .select('*')
-                    .ilike('status', 'selesai')
                     .in('status', ['Selesai', 'SK Diunggah', 'Ditolak'])
                     .order('created_at', { ascending: false });
 
                 if (error) throw error;
-                console.log("Data Usulan Selesai/Ditolak:", data);
 
                 const tbody = document.getElementById('dataArsip');
                 if (data.length === 0) {
@@ -272,7 +265,7 @@
                     tr.className = "arsip-row";
                     tr.setAttribute("data-bulan", formatDataBulan);
                     tr.setAttribute("data-jenis", filterJenisVal);
-                    tr.setAttribute("data-kecamatan", item.kecamatan || ""); // Untuk filter pencarian
+                    tr.setAttribute("data-kecamatan", item.kecamatan || ""); 
 
                     tr.innerHTML = `
                         <td>${index + 1}</td>
@@ -347,9 +340,12 @@
 
             if (data) {
                 const s = data.status;
+                
+                // FORMAT TANGGAL YANG AMAN (ANTI NULL/INVALID DATE)
                 const fmtDate = (dateStr) => {
-                    if (!dateStr) return null;
+                    if (!dateStr || dateStr === 'null') return null;
                     const d = new Date(dateStr);
+                    if (isNaN(d.getTime())) return null; 
                     return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) + " | " + 
                         d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + " WIB";
                 };
@@ -370,7 +366,7 @@
                             <i class="fas fa-file-export timeline-icon text-success"></i>
                             <div class="ms-3">
                                 <span class="fw-bold d-block text-dark">Berkas Diajukan oleh Desa</span>
-                                <small class="text-muted"><i class="far fa-clock me-1"></i> ${fmtDate(data.created_at)}</small>
+                                <small class="text-muted"><i class="far fa-clock me-1"></i> ${fmtDate(data.created_at) || '-'}</small>
                             </div>
                         </div>
 
@@ -379,7 +375,7 @@
                             <div class="ms-3">
                                 <span class="fw-bold d-block text-dark">Proses Penandatanganan Bupati</span>
                                 <small class="text-muted">
-                                    ${data.tgl_bupati ? `<i class="far fa-calendar-check me-1"></i> ${fmtDate(data.tgl_bupati)}` : 'Menunggu antrean berkas...'}
+                                    ${data.tgl_bupati && data.tgl_bupati !== 'null' ? `<i class="far fa-calendar-check me-1"></i> ${fmtDate(data.tgl_bupati)}` : 'Menunggu antrean berkas...'}
                                 </small>
                             </div>
                         </div>
@@ -389,7 +385,7 @@
                             <div class="ms-3">
                                 <span class="fw-bold d-block text-dark">Surat Rekomendasi Turun</span>
                                 <small class="text-muted">
-                                    ${data.tgl_rekom ? `<i class="far fa-calendar-check me-1"></i> ${fmtDate(data.tgl_rekom)}` : 'Berkas sedang diproses DPMD'}
+                                    ${data.tgl_rekom && data.tgl_rekom !== 'null' ? `<i class="far fa-calendar-check me-1"></i> ${fmtDate(data.tgl_rekom)}` : 'Berkas sedang diproses DPMD'}
                                 </small>
                             </div>
                         </div>
@@ -398,11 +394,11 @@
                             <i class="fas fa-handshake timeline-icon ${checkStep(['Sudah Diambil', 'Selesai'])}"></i>
                             <div class="ms-3">
                                 <span class="fw-bold d-block text-dark">Pengambilan Berkas Fisik</span>
-                                ${data.nama_penerima ? `
+                                ${data.nama_penerima && data.nama_penerima !== 'null' ? `
                                 <div class="info-box-pengambil">
                                     <div class="mb-1 small"><i class="fas fa-user text-success me-2"></i><b>Penerima:</b> ${data.nama_penerima}</div>
-                                    <div class="mb-1 small"><i class="fas fa-briefcase text-success me-2"></i><b>Jabatan:</b> ${data.jabatan_penerima}</div>
-                                    <div class="small"><i class="fas fa-calendar-alt text-success me-2"></i><b>Diambil:</b> ${fmtDate(data.tgl_ambil)}</div>
+                                    <div class="mb-1 small"><i class="fas fa-briefcase text-success me-2"></i><b>Jabatan:</b> ${data.jabatan_penerima && data.jabatan_penerima !== 'null' ? data.jabatan_penerima : '-'}</div>
+                                    <div class="small"><i class="fas fa-calendar-alt text-success me-2"></i><b>Diambil:</b> ${fmtDate(data.tgl_ambil) || '-'}</div>
                                 </div>` : `<small class="text-muted">Belum ada data pengambilan</small>`}
                             </div>
                         </div>
@@ -412,9 +408,9 @@
                             <div class="ms-3">
                                 <span class="fw-bold d-block text-dark">Proses Selesai (Arsip SK)</span>
                                 <small class="text-muted d-block mb-2">
-                                    ${isSelesai ? `<i class="fas fa-check-circle text-success me-1"></i> Selesai pada ${fmtDate(data.updated_at)}` : 'Menunggu upload SK desa'}
+                                    ${isSelesai ? `<i class="fas fa-check-circle text-success me-1"></i> Selesai` : 'Menunggu upload SK desa'}
                                 </small>
-                                ${isSelesai && data.sk_url ? `
+                                ${isSelesai && data.sk_url && data.sk_url !== 'null' ? `
                                     <a href="${data.sk_url}" target="_blank" class="btn btn-dark btn-sm w-100 py-2 mt-2" style="border-radius: 10px;">
                                         <i class="fas fa-file-pdf me-2"></i> Lihat Dokumen SK Terunggah
                                     </a>
@@ -430,7 +426,6 @@
             const elemenTabel = document.getElementById('tabelArsip');
             const bulanLabel = document.getElementById('filterBulan').options[document.getElementById('filterBulan').selectedIndex].text;
             
-            // Buat template laporan untuk PDF
             const template = `
                 <div style="padding: 20px; font-family: 'Times New Roman', Times, serif;">
                     <div style="text-align: center; border-bottom: 2px solid black; padding-bottom: 10px; margin-bottom: 20px;">
