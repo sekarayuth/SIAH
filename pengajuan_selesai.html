@@ -216,13 +216,17 @@
 
         let dataPengajuanSelesai = [];
         
-        // Ambil nama desa dari local storage. 
-        // Ubah 'Nama Desa Kamu' menjadi nama desa yang ada di databasemu untuk keperluan testing jika belum lewat halaman login
-        const desaLogin = localStorage.getItem('nama_desa');
+        // Ambil nama desa dari local storage. Jika kosong, gunakan nama desa default agar tidak error.
+        let desaLogin = localStorage.getItem('nama_desa');
+        
         if (!desaLogin) {
-            // Jika tidak ada data session, lempar kembali ke halaman login
-            window.location.href = 'index.html'; 
-        } 
+            // Mematikan redirect ke index.html sementara
+            // window.location.href = 'index.html'; 
+            
+            // Set nama desa default untuk testing. (Sesuaikan dengan nama desa di database Anda jika ingin melihat data sebenarnya)
+            desaLogin = 'Desa Testing'; 
+            console.log("Sesi login kosong. Menggunakan mode testing untuk:", desaLogin);
+        }
 
         // AMBIL DATA DARI DATABASE SUPABASE
         async function loadDataSelesai() {
