@@ -112,13 +112,22 @@
         </div>
 
         <div id="page-content-wrapper">
-            <nav class="navbar top-navbar">
+            <nav class="navbar top-navbar d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center">
-                    <button type="button" class="btn-toggle me-3" id="btnSidebarToggle">
+                    <button type="button" class="btn-toggle me-3" onclick="document.getElementById('wrapper').classList.toggle('toggled');">
                         <i class="fas fa-bars fa-lg" style="pointer-events: none;"></i>
                     </button>
                     <h5 class="m-0 fw-bold d-none d-sm-block text-dark">Ruang Kerja Pemerintah Desa</h5>
                 </div>
+                <!-- <div class="d-flex align-items-center gap-3">
+                    <div class="d-flex align-items-center pe-2 border-start ms-2 ps-3">
+                        <div class="text-end me-3 d-none d-md-block">
+                            <span class="d-block fw-bold text-dark" style="font-size: 0.9rem;">Admin Desa</span>
+                            <span class="text-muted" style="font-size: 0.75rem;">Kab. Malang</span>
+                        </div>
+                        <div class="rounded-circle shadow-sm d-flex align-items-center justify-content-center fw-bold text-white" style="width: 42px; height: 42px; background-color: var(--gov-primary); font-size: 1.2rem;">D</div>
+                    </div>
+                </div> -->
 
                 <div class="user-profile-section">
                     <div class="user-info d-none d-md-block">
