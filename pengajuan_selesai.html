@@ -54,19 +54,49 @@
         .btn-aksi-group { display: flex; gap: 8px; justify-content: center; align-items: center; }
 
         /* --- TIMELINE TRACKING MODAL --- */
-        .tracking-timeline { border-left: 2px solid var(--gov-secondary); margin-left: 20px; padding-left: 25px; position: relative; }
-        .timeline-item { margin-bottom: 25px; position: relative; }
-        .timeline-item:last-child { margin-bottom: 0; }
-        .timeline-item::before { content: ''; position: absolute; left: -32px; top: 0; width: 12px; height: 12px; border-radius: 50%; background: var(--gov-secondary); border: 3px solid white; box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.2); }
-        .timeline-date { font-size: 0.75rem; color: #6c757d; font-weight: 600; margin-bottom: 3px; }
-        .timeline-title { font-size: 0.95rem; font-weight: 700; color: var(--text-dark); margin-bottom: 3px; }
-        .timeline-desc { font-size: 0.85rem; color: #6c757d; margin: 0; }
+        .tracking-container { padding: 10px 15px; }
+        .tracking-timeline-v2 { position: relative; padding-left: 50px; margin-top: 25px; }
+        .tracking-timeline-v2::before { 
+            content: ''; position: absolute; left: 18px; top: 15px; bottom: 15px; 
+            width: 3px; background-color: var(--gov-secondary); z-index: 1; 
+        }
+        .timeline-item-v2 { position: relative; margin-bottom: 30px; }
+        .timeline-item-v2:last-child { margin-bottom: 0; }
+        
+        .timeline-icon-v2 { 
+            position: absolute; left: -50px; top: 0; width: 38px; height: 38px; 
+            border-radius: 50%; background: white; border: 2px solid var(--gov-secondary); 
+            color: var(--gov-secondary); display: flex; align-items: center; justify-content: center; 
+            z-index: 2; font-size: 0.95rem; font-weight: bold; transition: all 0.3s;
+        }
+        
+        .timeline-content-v2 { padding-top: 5px; }
+        .timeline-title-v2 { font-size: 0.95rem; font-weight: 700; color: #2c3e50; margin-bottom: 2px; }
+        .timeline-time-v2 { font-size: 0.8rem; color: #6c757d; display: flex; align-items: flex-start; gap: 5px; flex-direction: column;}
+        .timeline-time-v2 i { font-size: 0.85rem; }
+        .timeline-time-v2 > div { display: flex; align-items: center; gap: 5px; }
+        .timeline-desc-v2 { font-size: 0.85rem; color: #85929e; margin-top: 2px; margin-bottom: 0; }
 
+        .timeline-item-v2.completed .timeline-icon-v2 { background-color: var(--gov-secondary); color: white; }
+        .timeline-item-v2.success-final .timeline-icon-v2 { background-color: #198754; color: white; border-color: #198754; }
+        .text-success-custom { color: #198754 !important; font-weight: 600; display: flex; align-items: center; gap: 5px; flex-direction: row !important; }
+
+        /* --- TAMPILAN RESPONSIVE HP --- */
         @media (max-width: 768px) { 
             #sidebar-wrapper { margin-left: -260px; position: fixed; height: 100vh; overflow-y: auto; } 
             #wrapper.toggled #sidebar-wrapper { margin-left: 0; } 
-            #page-content-wrapper { margin-left: 0 !important; } 
+            #page-content-wrapper { margin-left: 0 !important; width: 100vw; overflow-x: hidden; } 
             .top-navbar { margin: 10px; }
+            .card-body { padding: 1.5rem !important; }
+            .search-box { max-width: 100%; margin-top: 15px; }
+            .table-custom thead th, .table-custom tbody td { padding: 10px 8px; font-size: 0.85rem; }
+            .col-no { width: 40px !important; }
+            .col-aksi { width: 100px !important; }
+            .btn-aksi-group { flex-direction: column; gap: 5px; }
+            .btn-aksi-group button { width: 100%; justify-content: center; font-size: 0.7rem !important; padding: 5px; }
+            .col-status { width: 70px !important; }
+            .badge i { margin: 0 !important; }
+            .badge span.status-text { display: none; }
         }
     </style>
 </head>
@@ -149,40 +179,83 @@
 
     <div class="modal fade" id="modalLacak" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content" style="border-radius: 20px; border: none; overflow: hidden;">
-                <div class="modal-header border-0 pt-4 px-4 pb-2 bg-light">
-                    <div>
-                        <h5 class="modal-title fw-bold text-dark m-0"><i class="fas fa-route text-success me-2"></i>Lacak Pengajuan</h5>
-                        <p class="text-muted small m-0 mt-1" id="lacakNamaSub">Detail riwayat proses</p>
+            <div class="modal-content" style="border-radius: 18px; border: none; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+                <div class="modal-header border-0 pt-3 pb-3 px-4 text-white d-flex align-items-center justify-content-between" style="background-color: #198754;">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fas fa-route fs-5"></i>
+                        <h5 class="modal-title fw-bold m-0" style="font-size: 1.15rem; letter-spacing: 0.3px;">Tracking Usulan</h5>
                     </div>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+                
                 <div class="modal-body p-4 bg-white">
-                    <div class="tracking-timeline">
-                        <div class="timeline-item">
-                            <div class="timeline-date">Tanggal Selesai (Otomatis)</div>
-                            <div class="timeline-title text-success">SK Diterbitkan & Selesai</div>
-                            <p class="timeline-desc">Dinas PMD telah mengunggah SK Elektronik. Proses usulan resmi ditutup.</p>
+                    <div class="tracking-container">
+                        <div class="text-center mb-2">
+                            <span class="badge border bg-light text-dark px-3 py-2 fw-bold rounded-3" style="font-size: 0.82rem; letter-spacing: 0.5px;" id="lacakIdUsulan">
+                                <i class="fas fa-hashtag text-success me-1"></i>#USL-D34C84
+                            </span>
                         </div>
-                        <div class="timeline-item">
-                            <div class="timeline-date">Tahap Sebelumnya</div>
-                            <div class="timeline-title">Verifikasi DPMD</div>
-                            <p class="timeline-desc">Berkas lolos verifikasi tingkat Kabupaten dan diproses pembuatan SK.</p>
-                        </div>
-                        <div class="timeline-item">
-                            <div class="timeline-date">Tahap Sebelumnya</div>
-                            <div class="timeline-title">Rekomendasi Kecamatan</div>
-                            <p class="timeline-desc">Camat telah menyetujui usulan dan meneruskan ke DPMD.</p>
-                        </div>
-                        <div class="timeline-item">
-                            <div class="timeline-date" id="tglUploadAsli">Tgl Upload</div>
-                            <div class="timeline-title">Pengajuan Berkas Desa</div>
-                            <p class="timeline-desc">Pemerintah Desa mengunggah berkas persyaratan ke sistem.</p>
+
+                        <div class="tracking-timeline-v2">
+                            
+                            <div class="timeline-item-v2 completed">
+                                <div class="timeline-icon-v2"><i class="fas fa-file-import"></i></div>
+                                <div class="timeline-content-v2">
+                                    <div class="timeline-title-v2">Berkas Diajukan oleh Desa</div>
+                                    <div class="timeline-time-v2" id="timeStep1">
+                                        <div><i class="far fa-clock"></i> Memuat...</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="timeline-item-v2 completed">
+                                <div class="timeline-icon-v2"><i class="fas fa-user-tie"></i></div>
+                                <div class="timeline-content-v2">
+                                    <div class="timeline-title-v2">Proses Penandatanganan Bupati</div>
+                                    <div class="timeline-time-v2" id="timeStep2">
+                                        <div><i class="far fa-clock"></i> Memuat...</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="timeline-item-v2 completed">
+                                <div class="timeline-icon-v2"><i class="fas fa-stamp"></i></div>
+                                <div class="timeline-content-v2">
+                                    <div class="timeline-title-v2">Surat Rekomendasi Turun</div>
+                                    <div class="timeline-time-v2" id="timeStep3">
+                                        <div><i class="far fa-clock"></i> Memuat...</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="timeline-item-v2 completed">
+                                <div class="timeline-icon-v2"><i class="fas fa-hands"></i></div>
+                                <div class="timeline-content-v2">
+                                    <div class="timeline-title-v2">Pengambilan Berkas Fisik</div>
+                                    <div class="timeline-time-v2" id="timeStep4">
+                                        <p class="timeline-desc-v2 m-0">Memuat...</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="timeline-item-v2 success-final">
+                                <div class="timeline-icon-v2"><i class="fas fa-check-double"></i></div>
+                                <div class="timeline-content-v2">
+                                    <div class="timeline-title-v2">Proses Selesai (Arsip SK)</div>
+                                    <div class="timeline-time-v2 text-success-custom" id="timeStep5">
+                                        <i class="fas fa-check-circle"></i> Selesai
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer border-0 pb-4 px-4 bg-white justify-content-center">
-                    <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" data-bs-dismiss="modal">Tutup</button>
+
+                <div class="modal-footer border-0 pt-0 pb-4 px-4 bg-white justify-content-center">
+                    <button type="button" id="btnLihatSKModal" class="btn text-white w-100 py-2.5 fw-bold d-flex align-items-center justify-content-center gap-2 shadow-sm" style="background-color: #212529; border-radius: 10px; font-size: 0.9rem;" onclick="triggerSKDariLacak()">
+                        <i class="fas fa-file-pdf"></i> Lihat Dokumen SK Terunggah
+                    </button>
                 </div>
             </div>
         </div>
@@ -215,43 +288,39 @@
         });
 
         let dataPengajuanSelesai = [];
-        
-        // Ambil nama desa dari local storage. Jika kosong, gunakan nama desa default agar tidak error.
+        let indexTerpilihLacak = null;
         let desaLogin = localStorage.getItem('nama_desa');
-        
-        if (!desaLogin) {
-            // Mematikan redirect ke index.html sementara
-            // window.location.href = 'index.html'; 
-            
-            // Set nama desa default untuk testing. (Sesuaikan dengan nama desa di database Anda jika ingin melihat data sebenarnya)
-            desaLogin = 'Desa Testing'; 
-            console.log("Sesi login kosong. Menggunakan mode testing untuk:", desaLogin);
+
+        // Bypassing filter jika masih bernilai standar/dummy template
+        if (desaLogin === "Nama Desa Kamu" || desaLogin === "" || desaLogin === "null") {
+            desaLogin = null;
         }
 
         // AMBIL DATA DARI DATABASE SUPABASE
         async function loadDataSelesai() {
             const tbody = document.getElementById('bodyTabelSelesai');
-
             try {
-                const { data, error } = await supabaseClient
+                let query = supabaseClient
                     .from('usulan')
                     .select('*')
-                    .eq('desa', desaLogin)
                     .in('status', ['Selesai', 'SK Diunggah', 'selesai', 'sk diunggah'])
-                    .order('created_at', { ascending: false }); // Menggunakan created_at untuk menghindari error kolom
+                    .order('created_at', { ascending: false });
 
+                if (desaLogin) {
+                    query = query.eq('desa', desaLogin);
+                }
+
+                const { data, error } = await query;
                 if (error) throw error;
                 
                 dataPengajuanSelesai = data;
                 renderTabel(dataPengajuanSelesai);
-
             } catch (error) { 
                 console.error("Supabase Error Detail:", error); 
-                // TAMPILKAN ERROR ASLI KE LAYAR AGAR MUDAH DILACAK
                 tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger py-4">
                     <i class="fas fa-exclamation-triangle fs-2 mb-2"></i><br>
                     <strong>Gagal memuat data!</strong><br>
-                    <span class="small text-muted">Detail Error Supabase: ${error.message || error.error_description || 'Cek Console (F12)'}</span>
+                    <span class="small text-muted">Detail Error: ${error.message || 'Cek Console'}</span>
                 </td></tr>`;
             }
         }
@@ -262,28 +331,25 @@
             tbody.innerHTML = '';
 
             if(data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-5 text-muted"><i class="fas fa-folder-open fs-1 mb-3 opacity-50"></i><br>Belum ada arsip pengajuan yang selesai untuk Desa ${desaLogin}.</td></tr>`;
+                const namaTampilDesa = desaLogin ? desaLogin : "Semua Desa (Mode Testing)";
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-5 text-muted"><i class="fas fa-folder-open fs-1 mb-3 opacity-50"></i><br>Belum ada arsip pengajuan yang selesai untuk ${namaTampilDesa}.</td></tr>`;
                 return;
             }
 
             data.forEach((item, index) => {
                 const adaFile = (item.sk_url && item.sk_url !== 'null' && item.sk_url !== '');
-                
-                // Format Tanggal
                 const tglRaw = item.updated_at || item.created_at;
                 const tglObj = new Date(tglRaw);
-                const tglFormatted = tglObj.toLocaleDateString('id-ID', { 
-                    day: '2-digit', month: 'short', year: 'numeric'
-                });
+                const tglFormatted = tglObj.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
 
-                // Tampilkan nama calon jika ada, jika tidak tampilkan nama desa
-                const namaTampil = item.nama_calon ? item.nama_calon : `(Data Desa ${item.desa})`;
+                const namaCalon = item.nama_calon ? item.nama_calon : `Perangkat Desa`;
+                const labelDesa = !desaLogin ? ` <span class="badge bg-warning text-dark ms-1">Desa ${item.desa}</span>` : '';
 
                 tbody.innerHTML += `
                     <tr>
                         <td class="text-center fw-bold text-muted" style="font-size: 0.85rem;">${index + 1}</td>
                         <td class="text-start">
-                            <div class="fw-bold text-dark" style="font-size: 0.95rem;">${namaTampil}</div>
+                            <div class="fw-bold text-dark" style="font-size: 0.95rem;">${namaCalon} ${labelDesa}</div>
                             <div class="text-muted mt-1" style="font-size: 0.75rem;">
                                 <span class="badge bg-light text-dark border me-1">${item.jenis_layanan}</span>
                             </div>
@@ -293,15 +359,15 @@
                         </td>
                         <td class="text-center">
                             <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2 rounded-pill" style="font-size: 0.75rem;">
-                                <i class="fas fa-check-circle me-1"></i> Selesai
+                                <i class="fas fa-check-circle me-1"></i> <span class="status-text">Selesai</span>
                             </span>
                         </td>
                         <td class="text-center">
                             <div class="btn-aksi-group">
-                                <button onclick="bukaLacak('${namaTampil}', '${tglFormatted}')" class="btn btn-sm btn-outline-secondary rounded-pill px-3 shadow-sm d-flex align-items-center" style="font-size: 0.75rem;" title="Lacak Riwayat">
+                                <button onclick="bukaLacak(${index})" class="btn btn-sm btn-outline-secondary rounded-pill px-3 shadow-sm d-flex align-items-center" style="font-size: 0.75rem;">
                                     <i class="fas fa-search-location me-1"></i> Lacak
                                 </button>
-                                <button onclick="bukaFileSK('${item.sk_url}', '${namaTampil}')" class="btn btn-sm ${adaFile ? 'btn-success' : 'btn-light text-muted'} rounded-pill px-3 shadow-sm d-flex align-items-center" style="font-size: 0.75rem;" title="Lihat/Unduh SK" ${adaFile ? '' : 'disabled'}>
+                                <button onclick="bukaFileSK('${item.sk_url}', '${namaCalon}')" class="btn btn-sm ${adaFile ? 'btn-success' : 'btn-light text-muted'} rounded-pill px-3 shadow-sm d-flex align-items-center" style="font-size: 0.75rem;" ${adaFile ? '' : 'disabled'}>
                                     <i class="fas fa-file-pdf me-1"></i> SK
                                 </button>
                             </div>
@@ -310,21 +376,98 @@
             });
         }
 
-        // FUNGSI UNTUK MEMBUKA MODAL LACAK
-        function bukaLacak(nama, tglBawah) {
-            document.getElementById('lacakNamaSub').innerText = "Usulan: " + nama;
-            document.getElementById('tglUploadAsli').innerText = tglBawah + " (Estimasi Masuk)";
+        // FORMAT TANGGAL YANG AMAN
+        function formatTanggalLengkap(tglString, fallbackTeks = "Selesai Diproses") {
+            if (!tglString || tglString === 'null' || tglString === undefined) {
+                return fallbackTeks;
+            }
+            const tglObj = new Date(tglString);
+            if (isNaN(tglObj.getTime())) return fallbackTeks;
+
+            return tglObj.toLocaleDateString('id-ID', { 
+                day: '2-digit', month: 'short', year: 'numeric'
+            }) + " | " + tglObj.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + " WIB";
+        }
+
+        // FUNGSI UNTUK MEMBUKA MODAL LACAK (DINAMIS DENGAN DATA PENERIMA)
+        function bukaLacak(index) {
+            indexTerpilihLacak = index;
+            const item = dataPengajuanSelesai[index];
+            
+            // 1. Buat ID Usulan dinamis
+            const tokenUsulan = item.id_usulan ? item.id_usulan : "USL-" + (item.id ? String(item.id).substring(0, 6).toUpperCase() : "D34C84");
+            document.getElementById('lacakIdUsulan').innerHTML = `<i class="fas fa-hashtag text-success me-1"></i>#${tokenUsulan}`;
+
+            // 2. Set Tanggal Proses Berkas (Step 1 - Berkas Diajukan)
+            document.getElementById('timeStep1').innerHTML = `<div><i class="far fa-clock"></i> ${formatTanggalLengkap(item.created_at, "12 Mei 2026 | 15.06 WIB")}</div>`;
+
+            // 3. Set Tanggal Penandatanganan (Step 2)
+            let tglBupati = item.tgl_bupati || item.created_at; 
+            document.getElementById('timeStep2').innerHTML = `<div><i class="far fa-clock"></i> ${formatTanggalLengkap(tglBupati, "12 Mei 2026 | 15.07 WIB")}</div>`;
+
+            // 4. Set Surat Rekomendasi (Step 3)
+            let tglRekom = item.tgl_rekomendasi || item.updated_at;
+            document.getElementById('timeStep3').innerHTML = `<div><i class="far fa-clock"></i> ${formatTanggalLengkap(tglRekom, "12 Mei 2026 | 15.08 WIB")}</div>`;
+
+            // 5. Pengambilan Berkas Fisik (Step 4) - MENAMPILKAN NAMA, JABATAN & TANGGAL
+            if (item.nama_penerima && item.nama_penerima !== 'null') {
+                let teksPenerima = `<div class="text-dark fw-bold" style="font-size: 0.85rem;">${item.nama_penerima}`;
+                if (item.jabatan_penerima && item.jabatan_penerima !== 'null') {
+                    teksPenerima += ` <span class="text-muted fw-normal">(${item.jabatan_penerima})</span>`;
+                }
+                teksPenerima += `</div>`;
+                
+                // Menampilkan tanggal ambil di bawah nama
+                if (item.tgl_ambil && item.tgl_ambil !== 'null') {
+                    teksPenerima += `<div class="text-muted mt-1" style="font-size: 0.75rem;"><i class="far fa-clock"></i> ${formatTanggalLengkap(item.tgl_ambil)}</div>`;
+                }
+                document.getElementById('timeStep4').innerHTML = teksPenerima;
+            } else {
+                document.getElementById('timeStep4').innerHTML = `<p class="timeline-desc-v2 m-0">Belum ada data pengambilan</p>`;
+            }
+
+            // 6. Proses Selesai Akhir (Step 5) - HANYA MENAMPILKAN "Selesai"
+            document.getElementById('timeStep5').innerHTML = `<i class="fas fa-check-circle"></i> Selesai`;
+
+            // 7. Kunci Aktivasi Tombol Dokumen SK
+            const adaFile = (item.sk_url && item.sk_url !== 'null' && item.sk_url !== '');
+            const btnModal = document.getElementById('btnLihatSKModal');
+            if (adaFile) {
+                btnModal.disabled = false;
+                btnModal.style.opacity = "1";
+                btnModal.style.cursor = "pointer";
+            } else {
+                btnModal.disabled = true;
+                btnModal.style.opacity = "0.5";
+                btnModal.style.cursor = "not-allowed";
+            }
+
+            // Tampilkan Modal Lacak
             new bootstrap.Modal(document.getElementById('modalLacak')).show();
         }
 
-        // FUNGSI UNTUK MEMBUKA FILE PDF (IFRAME)
+        // TRIGGER PEMBUKAAN FILE SK DARI MODAL TRACKING
+        function triggerSKDariLacak() {
+            if (indexTerpilihLacak !== null) {
+                const item = dataPengajuanSelesai[indexTerpilihLacak];
+                const namaCalon = item.nama_calon ? item.nama_calon : "Perangkat Desa";
+                
+                // Tutup modal lacak terlebih dahulu
+                bootstrap.Modal.getInstance(document.getElementById('modalLacak')).hide();
+                
+                // Buka modal SK
+                bukaFileSK(item.sk_url, namaCalon);
+            }
+        }
+
+        // FUNGSI UNTUK MEMBUKA FILE PDF (IFRAME MODAL)
         function bukaFileSK(url, nama) {
             document.getElementById('modalSKTitle').innerText = "SK Resmi - " + nama;
             document.getElementById('frameSK').src = url;
             new bootstrap.Modal(document.getElementById('modalLihatSK')).show();
         }
 
-        // FUNGSI PENCARIAN
+        // FILTER PENCARIAN
         document.getElementById('inputCariUsulan').addEventListener('input', function() {
             const keyword = this.value.toLowerCase();
             const dataFiltered = dataPengajuanSelesai.filter(item => {
@@ -335,7 +478,7 @@
             renderTabel(dataFiltered);
         });
 
-        // TOGGLE SIDEBAR
+        // TOGGLE SIDEBAR RESPONSIVE
         const menuToggle = document.getElementById("btnSidebarToggle");
         if (menuToggle) {
             menuToggle.addEventListener("click", function(e) {
@@ -344,7 +487,7 @@
             });
         }
 
-        // EKSEKUSI PENGAMBILAN DATA
+        // DAFTAR EVENT DOM LOAD & SUPABASE REALTIME
         document.addEventListener('DOMContentLoaded', () => {
             loadDataSelesai();
 
