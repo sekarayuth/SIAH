@@ -14,7 +14,12 @@
             --bg-light: #f4f7f6;
             --text-dark: #2c3e50;
         }
-        body { background-color: var(--bg-light); font-family: 'Poppins', sans-serif; color: var(--text-dark); overflow-x: hidden; }
+        body { 
+            background-color: var(--bg-light); 
+            font-family: 'Poppins', sans-serif; 
+            color: var(--text-dark); 
+            overflow-x: hidden; /* Mencegah scroll horizontal */
+        }
         
         /* Hero Section */
         .hero-section { background: linear-gradient(135deg, rgba(15, 76, 58, 0.95) 0%, rgba(25, 135, 84, 0.85) 100%), url('https://www.transparenttextures.com/patterns/cubes.png'); color: white; padding: 60px 0; border-bottom: 5px solid #f39c12; border-radius: 15px; margin-top: 15px; }
@@ -32,52 +37,33 @@
         .btn-rounded { border-radius: 50px; font-weight: 500; }
         .footer { background-color: var(--gov-primary); color: white; padding: 20px 0; margin-top: 60px; border-radius: 15px 15px 0 0; }
 
-        /* --- TATA LETAK & SIDEBAR (DIPERBAIKI) --- */
+        /* --- TATA LETAK & SIDEBAR (DIPERBAIKI UNTUK RESPONSIF) --- */
         #wrapper { display: flex; width: 100%; overflow-x: hidden; }
         
         #sidebar-wrapper { 
-            position: fixed; /* MENGUNCI SIDEBAR AGAR TIDAK SCROLL */
+            position: fixed; 
             top: 0;
             left: 0;
-            height: 100vh; /* Tinggi penuh layar */
+            height: 100vh; 
             width: 260px; 
             background: linear-gradient(180deg, var(--gov-primary) 0%, #062b20 100%); 
             color: white; 
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); 
             box-shadow: 4px 0 20px rgba(0,0,0,0.1); 
             z-index: 1050; 
-            overflow-y: auto; /* Scroll khusus untuk di dalam menu sidebar jika panjang */
+            overflow-y: auto; 
         }
         
         #page-content-wrapper { 
             width: 100%; 
-            margin-left: 260px; /* Mendorong konten putih ke kanan agar tidak tertimpa sidebar */
+            /* PERBAIKAN PENTING: Gunakan padding, bukan margin, agar box-sizing bekerja */
+            padding-left: 260px; 
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); 
-        }
-
-        /* --- Style untuk Overlay/Backdrop --- */
-        #sidebar-overlay {
-            display: none;
-            position: fixed;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.4); /* Warna gelap transparan */
-            z-index: 1045; /* Di bawah sidebar (1050) tapi di atas konten */
-            top: 0;
-            left: 0;
-            transition: all 0.3s;
-        }
-
-        /* Munculkan overlay hanya saat sidebar aktif (toggled) dan pada layar mobile */
-        @media (max-width: 768px) {
-            #wrapper.toggled #sidebar-overlay {
-                display: block;
-            }
         }
 
         /* Saat tombol menu diklik (Sidebar disembunyikan) */
         #wrapper.toggled #sidebar-wrapper { left: -260px; }
-        #wrapper.toggled #page-content-wrapper { margin-left: 0; }
+        #wrapper.toggled #page-content-wrapper { padding-left: 0; }
 
         .sidebar-brand { padding: 25px 20px; font-size: 1.3rem; font-weight: 800; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; }
         .sidebar-nav { padding: 15px 10px; }
@@ -85,110 +71,28 @@
         .nav-item-desa:hover, .nav-item-desa.active { color: white; background: linear-gradient(90deg, var(--gov-secondary) 0%, rgba(25,135,84,0.5) 100%); box-shadow: 0 4px 15px rgba(25,135,84,0.3); transform: translateX(5px); }
         .nav-item-desa i { width: 30px; font-size: 1.1rem; }
         
-        .top-navbar { background: white; margin: 15px 25px; border-radius: 15px; padding: 10px 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.02); }
+        .top-navbar { background: white; margin: 15px 25px; border-radius: 15px; padding: 12px 25px; box-shadow: 0 5px 20px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; }
         .btn-toggle { background: var(--bg-light); border: none; color: var(--gov-primary); border-radius: 10px; padding: 8px 15px; transition: 0.3s; cursor: pointer; }
         .btn-toggle:hover { background: var(--gov-primary); color: white; }
         
-        /* Tampilan Mobile */
+        /* --- PERBAIKAN TAMPILAN MOBILE --- */
         @media (max-width: 768px) { 
             #sidebar-wrapper { left: -260px; } 
             #wrapper.toggled #sidebar-wrapper { left: 0; } 
-            #page-content-wrapper { margin-left: 0 !important; } 
-            .top-navbar { margin: 10px; }
+            #page-content-wrapper { padding-left: 0 !important; } 
+            .top-navbar { margin: 10px; padding: 10px 15px; }
+            .hero-section { padding: 40px 15px; margin-top: 10px; border-radius: 10px;}
+            .hero-title { font-size: 1.8rem !important; }
+            .user-profile-section { padding-left: 10px; }
+            .container-fluid { padding-left: 10px; padding-right: 10px; }
         }
         
-        /* --- Tambahan untuk Perbaikan Navigasi & Lonceng --- */
-        .top-navbar { 
-            background: white; 
-            margin: 15px 25px; 
-            border-radius: 15px; 
-            padding: 12px 25px; 
-            box-shadow: 0 5px 20px rgba(0,0,0,0.02); 
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .user-profile-section {
-            display: flex;
-            align-items: center;
-            padding-left: 20px;
-            border-left: 1px solid #eee;
-        }
-
-        .user-info {
-            text-align: right;
-            margin-right: 12px;
-            line-height: 1.2;
-        }
-
-        .user-info .user-name {
-            display: block;
-            font-weight: 700;
-            font-size: 0.9rem;
-            color: var(--text-dark);
-        }
-
-        .user-info .user-region {
-            display: block;
-            font-size: 0.75rem;
-            color: #888;
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            background-color: var(--gov-primary);
-            color: white;
-            border-radius: 12px; 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            box-shadow: 0 4px 8px rgba(15, 76, 58, 0.2);
-        }
-        
-        .btn-notif { 
-            position: relative; 
-            background: #f8f9fa; 
-            border: none; 
-            border-radius: 10px; 
-            padding: 8px 12px; 
-            color: var(--gov-primary); 
-            transition: 0.3s; 
-        }
-        .btn-notif:hover { background: #e2e8f0; }
-
-        .badge-count { 
-            position: absolute; 
-            top: -5px; 
-            right: -5px; 
-            font-size: 0.65rem; 
-            padding: 4px 6px; 
-            border-radius: 50%; 
-            border: 2px solid white; 
-            font-weight: bold;
-        }
-
-        .dropdown-notif {
-            width: 320px; 
-            border-radius: 15px; 
-            border: none; 
-            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-            padding: 15px;
-            background-color: #ffffff !important; 
-            z-index: 1050; 
-        }
-
-        .notif-item {
-            font-size: 0.8rem;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            border-left: 4px solid #3498db;
-            background: #f8f9fa;
-        }
-        a.notif-item { text-decoration: none; color: inherit; display: block; transition: 0.2s; }
-        a.notif-item:hover { background: #edf2f7; transform: translateX(3px); }
+        /* Top Navbar Profile */
+        .user-profile-section { display: flex; align-items: center; padding-left: 20px; border-left: 1px solid #eee; }
+        .user-info { text-align: right; margin-right: 12px; line-height: 1.2; }
+        .user-info .user-name { display: block; font-weight: 700; font-size: 0.9rem; color: var(--text-dark); }
+        .user-info .user-region { display: block; font-size: 0.75rem; color: #888; }
+        .user-avatar { width: 40px; height: 40px; background-color: var(--gov-primary); color: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; box-shadow: 0 4px 8px rgba(15, 76, 58, 0.2); }
     </style>
 </head>
 <body>
@@ -208,9 +112,9 @@
         </div>
 
         <div id="page-content-wrapper">
-            <nav class="navbar top-navbar d-flex justify-content-between align-items-center">
+            <nav class="navbar top-navbar">
                 <div class="d-flex align-items-center">
-                    <button type="button" class="btn-toggle me-3" onclick="document.getElementById('wrapper').classList.toggle('toggled');">
+                    <button type="button" class="btn-toggle me-3" id="btnSidebarToggle">
                         <i class="fas fa-bars fa-lg" style="pointer-events: none;"></i>
                     </button>
                     <h5 class="m-0 fw-bold d-none d-sm-block text-dark">Ruang Kerja Pemerintah Desa</h5>
@@ -232,7 +136,7 @@
                     <div class="container py-2">
                         <span class="badge bg-warning text-dark mb-3 px-3 py-2 rounded-pill shadow-sm">Portal Layanan Terpadu Desa</span>
                         <h1 class="display-5 hero-title mb-3">Sistem Informasi Angkat Henti (SIAH)</h1>
-                        <p class="lead mx-auto" style="max-width: 800px; font-weight: 300; opacity: 0.9;">Platform administrasi pengangkatan, pemberhentian, dan mutasi Perangkat Desa terpadu di lingkungan Dinas Pemberdayaan Masyarakat dan Desa Kabupaten Malang.</p>
+                        <p class="lead mx-auto px-2" style="max-width: 800px; font-weight: 300; opacity: 0.9;">Platform administrasi pengangkatan, pemberhentian, dan mutasi Perangkat Desa terpadu di lingkungan Dinas Pemberdayaan Masyarakat dan Desa Kabupaten Malang.</p>
                     </div>
                 </section>
 
@@ -270,35 +174,38 @@
                 <section id="persyaratan" class="container mt-5 pt-4">
                     <div class="text-center mb-5">
                         <h2 class="section-title">Persyaratan Berkas Usulan</h2>
-                        <p class="text-muted mt-3">Daftar kelengkapan dokumen yang wajib dipenuhi sebelum melakukan pengajuan administrasi ke DPMD.</p>
+                        <p class="text-muted mt-3 px-2">Daftar kelengkapan dokumen yang wajib dipenuhi sebelum melakukan pengajuan administrasi ke DPMD.</p>
                     </div>
                     
                     <div class="row justify-content-center">
                         <div class="col-lg-10">
                             <div class="accordion shadow-sm" id="accordionPersyaratan">
+                                
                                 <div class="accordion-item mb-3">
                                     <h2 class="accordion-header">
-                                        <button class="accordion-button fw-bold py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSatu">
+                                        <button class="accordion-button fw-bold py-3 text-wrap" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSatu">
                                             <i class="fas fa-user-plus text-success me-3 fs-5"></i> 1. Berkas Pengajuan Pengangkatan Baru
                                         </button>
                                     </h2>
                                     <div id="collapseSatu" class="accordion-collapse collapse show" data-bs-parent="#accordionPersyaratan">
-                                        <div class="accordion-body bg-white p-4">
-                                            <ol class="list-group list-group-numbered mb-4 shadow-sm">
-                                                <li class="list-group-item">Surat Kades ke Bupati mengetahui Camat tembusan DPMD.</li>
-                                                <li class="list-group-item">SK Kades tentang Pembentukan Tim.</li>
-                                                <li class="list-group-item">Surat Ketua Tim ke Kades (Laporan hasil penjaringan dilampiri Berita Acara).</li>
-                                                <li class="list-group-item">Surat Kades ke Camat permohonan rekomendasi.</li>
-                                                <li class="list-group-item">Rekomendasi Camat.</li>
-                                                <li class="list-group-item">Fotokopi KTP calon perangkat terpilih.</li>
+                                        <div class="accordion-body bg-white p-3 p-md-4">
+                                            <ol class="list-group list-group-numbered mb-4 shadow-sm text-start">
+                                                <li class="list-group-item text-wrap">Surat Kades ke Bupati mengetahui Camat tembusan DPMD.</li>
+                                                <li class="list-group-item text-wrap">SK Kades tentang Pembentukan Tim.</li>
+                                                <li class="list-group-item text-wrap">Surat Ketua Tim ke Kades (Laporan hasil penjaringan dilampiri Berita Acara).</li>
+                                                <li class="list-group-item text-wrap">Surat Kades ke Camat permohonan rekomendasi.</li>
+                                                <li class="list-group-item text-wrap">Rekomendasi Camat.</li>
+                                                <li class="list-group-item text-wrap">Fotokopi KTP calon perangkat terpilih.</li>
                                             </ol>
                                             <div>
-                                                <a href="regulasi/UU Nomor 06 Tahun 2014.pdf" download class="btn btn-outline-success btn-sm btn-rounded w-100 mt-auto fw-medium"><i class="fas fa-cloud-download-alt me-2"></i>Unduh Contoh Dokumen Pengajuan Pengangkatan</a>  
+                                                <a href="regulasi/UU Nomor 06 Tahun 2014.pdf" download class="btn btn-outline-success btn-sm btn-rounded w-100 mt-auto fw-medium text-wrap py-2 lh-base">
+                                                    <i class="fas fa-cloud-download-alt me-1"></i> Unduh Contoh Dokumen Pengajuan Pengangkatan
+                                                </a>  
                                             </div>
                                             <br>
                                             <div class="alert alert-info border-start border-4 border-info bg-light m-0">
                                                 <h6 class="fw-bold text-dark mb-2"><i class="fas fa-file-contract text-info me-2"></i>Ketentuan Berkas Fisik:</h6>
-                                                <ul class="mb-2">
+                                                <ul class="mb-2 ps-3 text-wrap">
                                                     <li>Berkas <strong>ASLI 1 rangkap</strong> ditujukan ke Bupati.</li>
                                                     <li>Berkas <strong>FOTOKOPI 1 rangkap (Stempel Basah)</strong> ditujukan ke DPMD.</li>
                                                 </ul>
@@ -309,26 +216,28 @@
 
                                 <div class="accordion-item mb-3">
                                     <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed fw-bold py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDua">
+                                        <button class="accordion-button collapsed fw-bold py-3 text-wrap" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDua">
                                             <i class="fas fa-exchange-alt text-warning me-3 fs-5"></i> 2. Berkas Pengajuan Mutasi Jabatan
                                         </button>
                                     </h2>
                                     <div id="collapseDua" class="accordion-collapse collapse" data-bs-parent="#accordionPersyaratan">
-                                        <div class="accordion-body bg-white p-4">
-                                            <ol class="list-group list-group-numbered mb-4 shadow-sm">
-                                                <li class="list-group-item">Surat Kades ke Camat permohonan mutasi (Dilampirkan fotokopi SK Pengangkatan).</li>
-                                                <li class="list-group-item">Rekomendasi Camat.</li>
-                                                <li class="list-group-item">Surat Kades ke Bupati mengetahui Camat dengan tembusan DPMD.</li>
+                                        <div class="accordion-body bg-white p-3 p-md-4">
+                                            <ol class="list-group list-group-numbered mb-4 shadow-sm text-start">
+                                                <li class="list-group-item text-wrap">Surat Kades ke Camat permohonan mutasi (Dilampirkan fotokopi SK Pengangkatan).</li>
+                                                <li class="list-group-item text-wrap">Rekomendasi Camat.</li>
+                                                <li class="list-group-item text-wrap">Surat Kades ke Bupati mengetahui Camat dengan tembusan DPMD.</li>
                                             </ol>
                                             <div>
-                                                <a href="regulasi/UU Nomor 06 Tahun 2014.pdf" download class="btn btn-outline-success btn-sm btn-rounded w-100 mt-auto fw-medium"><i class="fas fa-cloud-download-alt me-2"></i>Unduh Contoh Dokumen Pengajuan Pemberhentian</a>  
+                                                <a href="regulasi/UU Nomor 06 Tahun 2014.pdf" download class="btn btn-outline-success btn-sm btn-rounded w-100 mt-auto fw-medium text-wrap py-2 lh-base">
+                                                    <i class="fas fa-cloud-download-alt me-1"></i> Unduh Contoh Dokumen Pengajuan Mutasi
+                                                </a>  
                                             </div>
                                             <br>
                                             <div class="alert alert-info border-start border-4 border-info bg-light m-0">
                                                 <h6 class="fw-bold text-dark mb-2"><i class="fas fa-file-contract text-info me-2"></i>Ketentuan Berkas Fisik:</h6>
-                                                <ul class="mb-2">
+                                                <ul class="mb-2 ps-3 text-wrap">
                                                     <li>Berkas <strong>ASLI 1 rangkap</strong> ditujukan ke Bupati.</li>
-                                                    <li>Berkas <strong>FOTOKOPI 1 rangkap (Stempel Basah) ditujukan</strong> ke DPMD.</li>
+                                                    <li>Berkas <strong>FOTOKOPI 1 rangkap (Stempel Basah)</strong> ditujukan ke DPMD.</li>
                                                 </ul>
                                             </div>
                                         </div>
@@ -337,34 +246,37 @@
 
                                 <div class="accordion-item mb-3">
                                     <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed fw-bold py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTiga">
+                                        <button class="accordion-button collapsed fw-bold py-3 text-wrap" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTiga">
                                             <i class="fas fa-user-times text-danger me-3 fs-5"></i> 3. Berkas Pengajuan Pemberhentian
                                         </button>
                                     </h2>
                                     <div id="collapseTiga" class="accordion-collapse collapse" data-bs-parent="#accordionPersyaratan">
-                                        <div class="accordion-body bg-white p-4">
-                                            <ol class="list-group list-group-numbered mb-4 shadow-sm">
-                                                <li class="list-group-item">Surat Kades ke Camat permohonan rekomendasi.</li>
-                                                <li class="list-group-item">Rekomendasi Camat.</li>
-                                                <li class="list-group-item">Dilampirkan SK Kades tentang pengangkatan perangkat desa bersangkutan.</li>
-                                                <li class="list-group-item">Surat Kades ke Bupati mengetahui Camat tembusan DPMD.</li>
+                                        <div class="accordion-body bg-white p-3 p-md-4">
+                                            <ol class="list-group list-group-numbered mb-4 shadow-sm text-start">
+                                                <li class="list-group-item text-wrap">Surat Kades ke Camat permohonan rekomendasi.</li>
+                                                <li class="list-group-item text-wrap">Rekomendasi Camat.</li>
+                                                <li class="list-group-item text-wrap">Dilampirkan SK Kades tentang pengangkatan perangkat desa bersangkutan.</li>
+                                                <li class="list-group-item text-wrap">Surat Kades ke Bupati mengetahui Camat tembusan DPMD.</li>
                                             </ol>
                                             <div>
-                                              <a href="regulasi/UU Nomor 06 Tahun 2014.pdf" download class="btn btn-outline-success btn-sm btn-rounded w-100 mt-auto fw-medium"><i class="fas fa-cloud-download-alt me-2"></i>Unduh Contoh Dokumen Pengajuan Pemberhentian</a>  
+                                              <a href="regulasi/UU Nomor 06 Tahun 2014.pdf" download class="btn btn-outline-success btn-sm btn-rounded w-100 mt-auto fw-medium text-wrap py-2 lh-base">
+                                                <i class="fas fa-cloud-download-alt me-1"></i> Unduh Contoh Dokumen Pengajuan Pemberhentian
+                                              </a>  
                                             </div>
                                             <br>
                                             <div class="alert alert-info border-start border-4 border-info bg-light m-0">
                                                 <h6 class="fw-bold text-dark mb-2"><i class="fas fa-file-contract text-info me-2"></i>Ketentuan Berkas Fisik:</h6>
-                                                <ul class="mb-2">
+                                                <ul class="mb-2 ps-3 text-wrap">
                                                     <li>Berkas <strong>ASLI 1 rangkap</strong> ditujukan ke Bupati.</li>
-                                                    <li>Berkas <strong>FOTOKOPI 1 rangkap (Stempel Basah) ditujukan</strong> ke DPMD.</li>
+                                                    <li>Berkas <strong>FOTOKOPI 1 rangkap (Stempel Basah)</strong> ditujukan ke DPMD.</li>
                                                 </ul>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+
                             </div>
-                            <div class="text-center text-danger fw-bold small bg-danger bg-opacity-10 p-3 rounded mt-4 border border-danger">
+                            <div class="text-center text-danger fw-bold small bg-danger bg-opacity-10 p-3 rounded mt-4 border border-danger mx-2 mx-md-0">
                                 <i class="fas fa-exclamation-triangle me-1"></i> PENTING: Sebelum dikirim ke bupati, seluruh berkas fisik di atas wajib dicek/diverifikasi terlebih dahulu secara langsung ke kantor DPMD!
                             </div>
                         </div>
@@ -469,44 +381,29 @@
 
                 if (error) throw error;
 
-                const badge = document.getElementById('notifBadge');
-                const list = document.getElementById('notifList');
-                // ... (logika notif lainnya)
+                // Logika Notifikasi bisa diletakkan di sini jika diperlukan kembali
             } catch (err) {
                 console.error("Error:", err);
             }
         }
 
         // Jalankan semua kode UI dan event listener saat DOM sudah ter-load
-        // ==========================================
-        // FUNGSI MENUTUP SIDEBAR SAAT KLIK DI LUAR MENU
-        // ==========================================
-        document.addEventListener('click', function(event) {
-            const sidebar = document.getElementById('sidebar-wrapper');
-            const toggleBtn = document.querySelector('.btn-toggle');
-            const wrapper = document.getElementById('wrapper');
+        document.addEventListener('DOMContentLoaded', () => {
+            loadNotificationsDesa();
 
-            // Pastikan elemen-elemennya ada di HTML
-            if (!sidebar || !toggleBtn || !wrapper) return;
-
-            // Cek apakah klik terjadi di LUAR sidebar dan di LUAR tombol menu (garis tiga)
-            if (!sidebar.contains(event.target) && !toggleBtn.contains(event.target)) {
-                
-                // Cek apakah ukuran layar saat ini adalah HP/Tablet (sesuai CSS-mu)
-                const isMobile = window.matchMedia("(max-width: 768px)").matches;
-
-                if (isMobile) {
-                    // MODE HP: Menu sembunyi dengan cara MENGHAPUS class 'toggled'
-                    wrapper.classList.remove('toggled');
-                } else {
-                    // MODE LAPTOP/PC: 
-                    // Secara normal, di laptop kita biarkan menu tetap terbuka saat konten diklik.
-                    // NAMUN, jika kamu *memang ingin* menunya otomatis sembunyi juga di laptop saat klik luar, 
-                    // cukup hapus tanda komentar (//) pada baris di bawah ini:
-                    
-                    // wrapper.classList.add('toggled');
-                }
+            // Sidebar Toggle Menu
+            const menuToggle = document.getElementById("btnSidebarToggle");
+            if (menuToggle) {
+                menuToggle.addEventListener("click", function(e) {
+                    e.preventDefault();
+                    document.getElementById("wrapper").classList.toggle("toggled");
+                });
             }
+
+            // Realtime Update Supabase
+            supabase.channel('changes').on('postgres_changes', { event: '*', schema: 'public', table: 'usulan' }, () => {
+                loadNotificationsDesa();
+            }).subscribe();
         });
     </script>
 </body>
