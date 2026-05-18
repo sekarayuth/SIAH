@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIAH Dasbor Desa - Beranda</title>
+    <title>Arsip Pengajuan Selesai - SIAH Desa</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
         :root {
             --gov-primary: #0f4c3a; 
@@ -14,97 +15,112 @@
             --bg-light: #f4f7f6;
             --text-dark: #2c3e50;
         }
-        body { 
-            background-color: var(--bg-light); 
-            font-family: 'Poppins', sans-serif; 
-            color: var(--text-dark); 
-            overflow-x: hidden; /* Mencegah scroll horizontal */
-        }
-        
-        /* Hero Section */
-        .hero-section { background: linear-gradient(135deg, rgba(15, 76, 58, 0.95) 0%, rgba(25, 135, 84, 0.85) 100%), url('https://www.transparenttextures.com/patterns/cubes.png'); color: white; padding: 60px 0; border-bottom: 5px solid #f39c12; border-radius: 15px; margin-top: 15px; }
-        .hero-title { font-weight: 700; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
-        
-        /* Regulasi & Persyaratan */
-        .section-title { font-weight: 700; color: var(--gov-primary); position: relative; display: inline-block; margin-bottom: 10px; }
-        .section-title::after { content: ''; width: 50%; height: 4px; background-color: #f39c12; position: absolute; bottom: -10px; left: 25%; border-radius: 2px; }
-        .doc-card { transition: all 0.3s ease; border: none; border-radius: 15px; background-color: white; border-top: 5px solid var(--gov-secondary); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-        .doc-card:hover { transform: translateY(-8px); box-shadow: 0 15px 35px rgba(25, 135, 84, 0.15); }
-        .icon-doc { font-size: 3.5rem; color: var(--gov-secondary); margin-bottom: 15px; opacity: 0.8; }
-        .accordion-button:not(.collapsed) { background-color: #e8f5e9; color: var(--gov-primary); font-weight: 600; box-shadow: none; }
-        .accordion-button:focus { box-shadow: none; }
-        .accordion-item { border: 1px solid rgba(0,0,0,.08) !important; border-radius: 10px !important; overflow: hidden; }
-        .btn-rounded { border-radius: 50px; font-weight: 500; }
-        .footer { background-color: var(--gov-primary); color: white; padding: 20px 0; margin-top: 60px; border-radius: 15px 15px 0 0; }
+        body { background-color: var(--bg-light); font-family: 'Poppins', sans-serif; color: var(--text-dark); overflow-x: hidden; }
 
-        /* --- TATA LETAK & SIDEBAR (DIPERBAIKI UNTUK RESPONSIF) --- */
-        #wrapper { display: flex; width: 100%; overflow-x: hidden; }
-        
+        /* --- TATA LETAK & SIDEBAR --- */
+        #wrapper { display: flex; width: 100%; align-items: stretch; overflow-x: hidden; }
         #sidebar-wrapper { 
-            position: fixed; 
-            top: 0;
-            left: 0;
-            height: 100vh; 
-            width: 260px; 
+            min-height: 100vh; width: 260px; flex-shrink: 0;
             background: linear-gradient(180deg, var(--gov-primary) 0%, #062b20 100%); 
-            color: white; 
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); 
-            box-shadow: 4px 0 20px rgba(0,0,0,0.1); 
-            z-index: 1050; 
-            overflow-y: auto; 
+            color: white; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); 
+            box-shadow: 4px 0 20px rgba(0,0,0,0.1); z-index: 1050; 
         }
+        #page-content-wrapper { width: 100%; flex: 1; min-width: 0; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
+        #wrapper.toggled #sidebar-wrapper { margin-left: -260px; }
         
-        #page-content-wrapper { 
-            width: 100%; 
-            /* PERBAIKAN PENTING: Gunakan padding, bukan margin, agar box-sizing bekerja */
-            padding-left: 260px; 
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); 
-        }
-
-        /* Saat tombol menu diklik (Sidebar disembunyikan) */
-        #wrapper.toggled #sidebar-wrapper { left: -260px; }
-        #wrapper.toggled #page-content-wrapper { padding-left: 0; }
-
         .sidebar-brand { padding: 25px 20px; font-size: 1.3rem; font-weight: 800; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; }
         .sidebar-nav { padding: 15px 10px; }
         .nav-item-desa { color: rgba(255,255,255,0.7); padding: 12px 20px; margin-bottom: 5px; border-radius: 12px; display: flex; align-items: center; font-weight: 500; text-decoration: none; transition: all 0.3s ease; }
         .nav-item-desa:hover, .nav-item-desa.active { color: white; background: linear-gradient(90deg, var(--gov-secondary) 0%, rgba(25,135,84,0.5) 100%); box-shadow: 0 4px 15px rgba(25,135,84,0.3); transform: translateX(5px); }
         .nav-item-desa i { width: 30px; font-size: 1.1rem; }
-        
-        .top-navbar { background: white; margin: 15px 25px; border-radius: 15px; padding: 12px 25px; box-shadow: 0 5px 20px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; }
+
+        /* --- NAVBAR --- */
+        .top-navbar { background: white; margin: 15px 25px; border-radius: 15px; padding: 10px 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.02); position: relative; z-index: 1040; }
         .btn-toggle { background: var(--bg-light); border: none; color: var(--gov-primary); border-radius: 10px; padding: 8px 15px; transition: 0.3s; cursor: pointer; }
         .btn-toggle:hover { background: var(--gov-primary); color: white; }
         
-        /* --- PERBAIKAN TAMPILAN MOBILE --- */
-        @media (max-width: 768px) { 
-            #sidebar-wrapper { left: -260px; } 
-            #wrapper.toggled #sidebar-wrapper { left: 0; } 
-            #page-content-wrapper { padding-left: 0 !important; } 
-            .top-navbar { margin: 10px; padding: 10px 15px; }
-            .hero-section { padding: 40px 15px; margin-top: 10px; border-radius: 10px;}
-            .hero-title { font-size: 1.8rem !important; }
-            .user-profile-section { padding-left: 10px; }
-            .container-fluid { padding-left: 10px; padding-right: 10px; }
+        /* --- SEARCH & TABLE --- */
+        .search-box { position: relative; max-width: 350px; width: 100%; }
+        .search-box i { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: #adb5bd; }
+        .search-box input { padding: 12px 15px 12px 45px; border-radius: 14px; border: 1px solid #dee2e6; font-size: 0.9rem; transition: all 0.3s; }
+        .search-box input:focus { border-color: var(--gov-secondary); box-shadow: 0 0 0 0.25rem rgba(25,135,84,0.25); outline: none; }
+
+        /* PERBAIKAN CSS TABEL */
+        .table-custom { width: 100%; vertical-align: middle; }
+        .table-custom thead th { vertical-align: middle !important; text-align: center; background-color: #f8f9fa; color: #6c757d; font-weight: 600; padding: 15px 10px; border-bottom: 2px solid #dee2e6; white-space: nowrap; }
+        .table-custom tbody td { vertical-align: middle !important; padding: 15px 10px; }
+        
+        .col-no { min-width: 50px !important; width: 50px; text-align: center; }
+        .col-status { min-width: 140px !important; }
+        .col-aksi { min-width: 180px !important; }
+        
+        .table-custom th:nth-child(2), .table-custom td:nth-child(2) { min-width: 220px; text-align: left; }
+        .table-custom th:nth-child(3), .table-custom td:nth-child(3) { min-width: 130px; white-space: nowrap; text-align: center; }
+        
+        .btn-aksi-group { display: flex; gap: 8px; justify-content: center; align-items: center; }
+
+        /* --- TIMELINE TRACKING MODAL --- */
+        .tracking-container { padding: 10px 15px; }
+        .tracking-timeline-v2 { position: relative; padding-left: 50px; margin-top: 25px; }
+        .tracking-timeline-v2::before { 
+            content: ''; position: absolute; left: 18px; top: 15px; bottom: 15px; 
+            width: 3px; background-color: var(--gov-secondary); z-index: 1; 
+        }
+        .timeline-item-v2 { position: relative; margin-bottom: 30px; }
+        .timeline-item-v2:last-child { margin-bottom: 0; }
+        
+        .timeline-icon-v2 { 
+            position: absolute; left: -50px; top: 0; width: 38px; height: 38px; 
+            border-radius: 50%; background: white; border: 2px solid var(--gov-secondary); 
+            color: var(--gov-secondary); display: flex; align-items: center; justify-content: center; 
+            z-index: 2; font-size: 0.95rem; font-weight: bold; transition: all 0.3s;
         }
         
-        /* Top Navbar Profile */
-        .user-profile-section { display: flex; align-items: center; padding-left: 20px; border-left: 1px solid #eee; }
-        .user-info { text-align: right; margin-right: 12px; line-height: 1.2; }
-        .user-info .user-name { display: block; font-weight: 700; font-size: 0.9rem; color: var(--text-dark); }
-        .user-info .user-region { display: block; font-size: 0.75rem; color: #888; }
-        .user-avatar { width: 40px; height: 40px; background-color: var(--gov-primary); color: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; box-shadow: 0 4px 8px rgba(15, 76, 58, 0.2); }
+        .timeline-content-v2 { padding-top: 5px; }
+        .timeline-title-v2 { font-size: 0.95rem; font-weight: 700; color: #2c3e50; margin-bottom: 2px; }
+        .timeline-time-v2 { font-size: 0.8rem; color: #6c757d; display: flex; align-items: flex-start; gap: 5px; flex-direction: column;}
+        .timeline-time-v2 i { font-size: 0.85rem; }
+        .timeline-time-v2 > div { display: flex; align-items: center; gap: 5px; }
+        .timeline-desc-v2 { font-size: 0.85rem; color: #85929e; margin-top: 2px; margin-bottom: 0; }
+
+        .timeline-item-v2.completed .timeline-icon-v2 { background-color: var(--gov-secondary); color: white; }
+        .timeline-item-v2.success-final .timeline-icon-v2 { background-color: #198754; color: white; border-color: #198754; }
+        .text-success-custom { color: #198754 !important; font-weight: 600; display: flex; align-items: center; gap: 5px; flex-direction: row !important; }
+
+        /* --- TAMPILAN RESPONSIVE HP --- */
+        @media (max-width: 768px) { 
+            #sidebar-wrapper { margin-left: -260px; position: fixed; height: 100vh; overflow-y: auto; } 
+            #wrapper.toggled #sidebar-wrapper { margin-left: 0; } 
+            #page-content-wrapper { margin-left: 0 !important; width: 100vw; overflow-x: hidden; } 
+            .top-navbar { margin: 10px; }
+            .card-body { padding: 1.5rem !important; }
+            .search-box { max-width: 100%; margin-top: 15px; }
+            
+            /* PERBAIKAN RESPONSIVE TABEL */
+            .table-custom thead th, .table-custom tbody td { padding: 10px 8px; font-size: 0.85rem; }
+            .col-no { min-width: 40px !important; }
+            .col-aksi { min-width: 180px !important; }
+            .col-status { min-width: 120px !important; }
+            
+            .btn-aksi-group { flex-direction: row; gap: 5px; flex-wrap: nowrap; } 
+            .btn-aksi-group button { width: auto; justify-content: center; font-size: 0.75rem !important; padding: 5px 10px; }
+            
+            .badge i { margin-right: 5px !important; } 
+            .badge span.status-text { display: inline-block; } 
+        }
     </style>
 </head>
 <body>
+
     <div id="wrapper">
         <div id="sidebar-wrapper">
             <div class="sidebar-brand"><i class="fas fa-building text-warning me-2"></i><span>SIAH Desa</span></div>
             <div class="sidebar-nav">
                 <p class="text-uppercase" style="font-size: 0.7rem; color: rgba(255,255,255,0.4); margin: 15px 0 5px 15px; font-weight: 600;">Menu Utama</p>
-                <a href="dashboard.html" class="nav-item-desa active"><i class="fas fa-home me-2"></i>Dasbor & Regulasi</a>
+                <a href="dashboard.html" class="nav-item-desa"><i class="fas fa-home me-2"></i>Dasbor & Regulasi</a>
                 <a href="lacak_usulan.html" class="nav-item-desa"><i class="fas fa-search-location me-2"></i>Lacak & Progres Usulan</a>
                 <a href="unggah_berkas.html" class="nav-item-desa"><i class="fas fa-cloud-upload-alt me-2"></i>Pengajuan Berkas</a>
-                <a href="pengajuan_selesai.html" class="nav-item-desa"><i class="fas fa-check-circle me-2"></i>Pengajuan Selesai</a>
+                <a href="pengajuan_selesai.html" class="nav-item-desa active"><i class="fas fa-check-circle me-2"></i>Pengajuan Selesai</a>
                 <div class="mt-5 px-3">
                     <a href="index.html" class="btn btn-outline-danger w-100 fw-bold" style="border-radius: 12px;"><i class="fas fa-sign-out-alt me-2"></i>Keluar / Logout</a>
                 </div>
@@ -112,298 +128,385 @@
         </div>
 
         <div id="page-content-wrapper">
-            <nav class="navbar top-navbar">
+            <nav class="navbar top-navbar d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center">
-                    <button type="button" class="btn-toggle me-3" id="btnSidebarToggle">
+                    <button type="button" id="btnSidebarToggle" class="btn-toggle me-3">
                         <i class="fas fa-bars fa-lg" style="pointer-events: none;"></i>
                     </button>
                     <h5 class="m-0 fw-bold d-none d-sm-block text-dark">Ruang Kerja Pemerintah Desa</h5>
                 </div>
-
-                <div class="user-profile-section">
-                    <div class="user-info d-none d-md-block">
-                        <span class="user-name" id="profile-desa-name">Desa Permanu</span>
-                        <span class="user-region" id="profile-kecamatan">Kab. Malang</span>
-                    </div>
-                    <div class="user-avatar shadow-sm">
-                        D
-                    </div>
-                </div>
             </nav>
 
             <div class="container-fluid px-4 py-3">
-                <section class="hero-section text-center shadow-sm">
-                    <div class="container py-2">
-                        <span class="badge bg-warning text-dark mb-3 px-3 py-2 rounded-pill shadow-sm">Portal Layanan Terpadu Desa</span>
-                        <h1 class="display-5 hero-title mb-3">Sistem Informasi Angkat Henti (SIAH)</h1>
-                        <p class="lead mx-auto px-2" style="max-width: 800px; font-weight: 300; opacity: 0.9;">Platform administrasi pengangkatan, pemberhentian, dan mutasi Perangkat Desa terpadu di lingkungan Dinas Pemberdayaan Masyarakat dan Desa Kabupaten Malang.</p>
-                    </div>
-                </section>
-
-                <section id="tutorial-alur" class="container mt-5 pt-2">
-                    <div class="text-center mb-5">
-                        <h2 class="section-title">Alur Penggunaan Sistem</h2>
-                        <p class="text-muted mt-3">Panduan singkat bagi Admin Desa untuk memulai pengajuan administrasi.</p>
-                    </div>
-                    
-                    <div class="row g-4 text-center justify-content-center">
-                        <div class="col-lg-4 col-md-6">
-                            <div class="card doc-card h-100 p-4 border-0 shadow-sm">
-                                <div class="rounded-circle bg-success bg-opacity-10 text-success d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 70px; height: 70px; font-size: 1.5rem; font-weight: 700;">1</div>
-                                <h5 class="fw-bold">Lengkapi Berkas Usulan</h5>
-                                <p class="small text-muted mb-0">Pastikan persyaratan usulan berkas Anda sudah lengkap. Persyaratan detail dapat dibaca pada bagian bawah halaman ini.</p>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 col-md-6">
-                            <div class="card doc-card h-100 p-4 border-0 shadow-sm">
-                                <div class="rounded-circle bg-success bg-opacity-10 text-success d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 70px; height: 70px; font-size: 1.5rem; font-weight: 700;">2</div>
-                                <h5 class="fw-bold">Klik Menu Unggah Berkas</h5>
-                                <p class="small text-muted mb-0">Jika berkas sudah lengkap, silakan klik menu <strong>"Unggah Berkas"</strong> yang terletak pada panel samping (sidebar).</p>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 col-md-6">
-                            <div class="card doc-card h-100 p-4 border-0 shadow-sm">
-                                <div class="rounded-circle bg-success bg-opacity-10 text-success d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 70px; height: 70px; font-size: 1.5rem; font-weight: 700;">3</div>
-                                <h5 class="fw-bold">Pilih Kategori Usulan</h5>
-                                <p class="small text-muted mb-0">Pada halaman pengunggahan, pilih jenis usulan berkas yang sesuai dengan kebutuhan pengajuan Anda.</p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <section id="persyaratan" class="container mt-5 pt-4">
-                    <div class="text-center mb-5">
-                        <h2 class="section-title">Persyaratan Berkas Usulan</h2>
-                        <p class="text-muted mt-3 px-2">Daftar kelengkapan dokumen yang wajib dipenuhi sebelum melakukan pengajuan administrasi ke DPMD.</p>
-                    </div>
-                    
-                    <div class="row justify-content-center">
-                        <div class="col-lg-10">
-                            <div class="accordion shadow-sm" id="accordionPersyaratan">
-                                
-                                <div class="accordion-item mb-3">
-                                    <h2 class="accordion-header">
-                                        <button class="accordion-button fw-bold py-3 text-wrap" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSatu">
-                                            <i class="fas fa-user-plus text-success me-3 fs-5"></i> 1. Berkas Pengajuan Pengangkatan Baru
-                                        </button>
-                                    </h2>
-                                    <div id="collapseSatu" class="accordion-collapse collapse show" data-bs-parent="#accordionPersyaratan">
-                                        <div class="accordion-body bg-white p-3 p-md-4">
-                                            <ol class="list-group list-group-numbered mb-4 shadow-sm text-start">
-                                                <li class="list-group-item text-wrap">Surat Kades ke Bupati mengetahui Camat tembusan DPMD.</li>
-                                                <li class="list-group-item text-wrap">SK Kades tentang Pembentukan Tim.</li>
-                                                <li class="list-group-item text-wrap">Surat Ketua Tim ke Kades (Laporan hasil penjaringan dilampiri Berita Acara).</li>
-                                                <li class="list-group-item text-wrap">Surat Kades ke Camat permohonan rekomendasi.</li>
-                                                <li class="list-group-item text-wrap">Rekomendasi Camat.</li>
-                                                <li class="list-group-item text-wrap">Fotokopi KTP calon perangkat terpilih.</li>
-                                            </ol>
-                                            <div>
-                                                <a href="regulasi/UU Nomor 06 Tahun 2014.pdf" download class="btn btn-outline-success btn-sm btn-rounded w-100 mt-auto fw-medium text-wrap py-2 lh-base">
-                                                    <i class="fas fa-cloud-download-alt me-1"></i> Unduh Contoh Dokumen Pengajuan Pengangkatan
-                                                </a>  
-                                            </div>
-                                            <br>
-                                            <div class="alert alert-info border-start border-4 border-info bg-light m-0">
-                                                <h6 class="fw-bold text-dark mb-2"><i class="fas fa-file-contract text-info me-2"></i>Ketentuan Berkas Fisik:</h6>
-                                                <ul class="mb-2 ps-3 text-wrap">
-                                                    <li>Berkas <strong>ASLI 1 rangkap</strong> ditujukan ke Bupati.</li>
-                                                    <li>Berkas <strong>FOTOKOPI 1 rangkap (Stempel Basah)</strong> ditujukan ke DPMD.</li>
-                                                </ul>
-                                            </div>
-                                        </div>
+                <div class="card border-0 shadow-sm mb-4" style="border-radius: 15px;">
+                    <div class="card-body p-4 p-lg-5">
+                        <div class="row mb-4 pb-3 border-bottom align-items-center">
+                            <div class="col-md-7 mb-3 mb-md-0">
+                                <div class="d-flex align-items-center mb-1">
+                                    <div class="bg-success bg-opacity-10 text-success p-3 rounded-4 me-3 d-flex align-items-center justify-content-center">
+                                        <i class="fas fa-check-double fs-3"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="fw-bold text-dark m-0">Arsip Pengajuan Selesai</h4>
+                                        <p class="text-muted small mb-0 mt-1">Daftar usulan administrasi perangkat desa yang telah selesai diproses dan SK telah diterbitkan.</p>
                                     </div>
                                 </div>
-
-                                <div class="accordion-item mb-3">
-                                    <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed fw-bold py-3 text-wrap" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDua">
-                                            <i class="fas fa-exchange-alt text-warning me-3 fs-5"></i> 2. Berkas Pengajuan Mutasi Jabatan
-                                        </button>
-                                    </h2>
-                                    <div id="collapseDua" class="accordion-collapse collapse" data-bs-parent="#accordionPersyaratan">
-                                        <div class="accordion-body bg-white p-3 p-md-4">
-                                            <ol class="list-group list-group-numbered mb-4 shadow-sm text-start">
-                                                <li class="list-group-item text-wrap">Surat Kades ke Camat permohonan mutasi (Dilampirkan fotokopi SK Pengangkatan).</li>
-                                                <li class="list-group-item text-wrap">Rekomendasi Camat.</li>
-                                                <li class="list-group-item text-wrap">Surat Kades ke Bupati mengetahui Camat dengan tembusan DPMD.</li>
-                                            </ol>
-                                            <div>
-                                                <a href="regulasi/UU Nomor 06 Tahun 2014.pdf" download class="btn btn-outline-success btn-sm btn-rounded w-100 mt-auto fw-medium text-wrap py-2 lh-base">
-                                                    <i class="fas fa-cloud-download-alt me-1"></i> Unduh Contoh Dokumen Pengajuan Mutasi
-                                                </a>  
-                                            </div>
-                                            <br>
-                                            <div class="alert alert-info border-start border-4 border-info bg-light m-0">
-                                                <h6 class="fw-bold text-dark mb-2"><i class="fas fa-file-contract text-info me-2"></i>Ketentuan Berkas Fisik:</h6>
-                                                <ul class="mb-2 ps-3 text-wrap">
-                                                    <li>Berkas <strong>ASLI 1 rangkap</strong> ditujukan ke Bupati.</li>
-                                                    <li>Berkas <strong>FOTOKOPI 1 rangkap (Stempel Basah)</strong> ditujukan ke DPMD.</li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
+                            </div>
+                            <div class="col-md-5 d-flex justify-content-md-end">
+                                <div class="search-box">
+                                    <i class="fas fa-search"></i>
+                                    <input type="text" id="inputCariUsulan" class="form-control w-100" placeholder="Cari nama calon/perangkat...">
                                 </div>
-
-                                <div class="accordion-item mb-3">
-                                    <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed fw-bold py-3 text-wrap" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTiga">
-                                            <i class="fas fa-user-times text-danger me-3 fs-5"></i> 3. Berkas Pengajuan Pemberhentian
-                                        </button>
-                                    </h2>
-                                    <div id="collapseTiga" class="accordion-collapse collapse" data-bs-parent="#accordionPersyaratan">
-                                        <div class="accordion-body bg-white p-3 p-md-4">
-                                            <ol class="list-group list-group-numbered mb-4 shadow-sm text-start">
-                                                <li class="list-group-item text-wrap">Surat Kades ke Camat permohonan rekomendasi.</li>
-                                                <li class="list-group-item text-wrap">Rekomendasi Camat.</li>
-                                                <li class="list-group-item text-wrap">Dilampirkan SK Kades tentang pengangkatan perangkat desa bersangkutan.</li>
-                                                <li class="list-group-item text-wrap">Surat Kades ke Bupati mengetahui Camat tembusan DPMD.</li>
-                                            </ol>
-                                            <div>
-                                              <a href="regulasi/UU Nomor 06 Tahun 2014.pdf" download class="btn btn-outline-success btn-sm btn-rounded w-100 mt-auto fw-medium text-wrap py-2 lh-base">
-                                                <i class="fas fa-cloud-download-alt me-1"></i> Unduh Contoh Dokumen Pengajuan Pemberhentian
-                                              </a>  
-                                            </div>
-                                            <br>
-                                            <div class="alert alert-info border-start border-4 border-info bg-light m-0">
-                                                <h6 class="fw-bold text-dark mb-2"><i class="fas fa-file-contract text-info me-2"></i>Ketentuan Berkas Fisik:</h6>
-                                                <ul class="mb-2 ps-3 text-wrap">
-                                                    <li>Berkas <strong>ASLI 1 rangkap</strong> ditujukan ke Bupati.</li>
-                                                    <li>Berkas <strong>FOTOKOPI 1 rangkap (Stempel Basah)</strong> ditujukan ke DPMD.</li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
                             </div>
-                            <div class="text-center text-danger fw-bold small bg-danger bg-opacity-10 p-3 rounded mt-4 border border-danger mx-2 mx-md-0">
-                                <i class="fas fa-exclamation-triangle me-1"></i> PENTING: Sebelum dikirim ke bupati, seluruh berkas fisik di atas wajib dicek/diverifikasi terlebih dahulu secara langsung ke kantor DPMD!
-                            </div>
+                        </div>
+
+                        <div class="table-responsive rounded-4 border">
+                            <table class="table table-hover table-custom mb-0">
+                                <thead>
+                                    <tr style="font-size: 0.8rem;">
+                                        <th class="col-no">NO</th>
+                                        <th class="text-start">NAMA & LAYANAN</th>
+                                        <th class="text-center">TGL SELESAI</th>
+                                        <th class="col-status text-center">STATUS</th>
+                                        <th class="col-aksi">AKSI</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="bodyTabelSelesai">
+                                    <tr>
+                                        <td colspan="5" class="text-center py-5">
+                                            <i class="fas fa-spinner fa-spin text-success fs-2 mb-3"></i>
+                                            <p class="text-muted">Menyambungkan ke database...</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
-                </section>
-
-                <section id="regulasi" class="container mt-5 pt-4 mb-5">
-                    <div class="text-center mb-5">
-                        <h2 class="section-title">Regulasi dan Hukum</h2>
-                        <p class="text-muted mt-3">Acuan yuridis pelaksanaan administrasi perangkat desa secara tertib dan transparan.</p>
-                    </div>
-                    <div class="row g-4 justify-content-center">
-                        <div class="col-lg-4 col-md-6">
-                            <div class="card doc-card h-100 p-4 text-center d-flex flex-column">
-                                <i class="fas fa-scale-balanced icon-doc"></i>
-                                <h5 class="fw-bold text-dark mt-2">UU No. 6 Tahun 2014</h5>
-                                <p class="text-muted small mt-2 mb-4">Tentang Desa, sebagaimana telah diubah beberapa kali, terakhir dengan UU No. 3 Tahun 2024.</p>
-                                <a href="regulasi/UU Nomor 06 Tahun 2014.pdf" download class="btn btn-outline-success btn-sm btn-rounded w-100 mt-auto fw-medium"><i class="fas fa-cloud-download-alt me-2"></i>Unduh Dokumen</a>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 col-md-6">
-                            <div class="card doc-card h-100 p-4 text-center d-flex flex-column">
-                                <i class="fas fa-file-contract icon-doc"></i>
-                                <h5 class="fw-bold text-dark mt-2">PP No. 16 Tahun 2026</h5>
-                                <p class="text-muted small mt-2 mb-4">Tentang Peraturan Pelaksanaan Undang-Undang Nomor 6 Tahun 2014 tentang Desa.</p>
-                                <a href="regulasi/PP Nomor 16 Tahun 2026.pdf" download class="btn btn-outline-success btn-sm btn-rounded w-100 mt-auto fw-medium"><i class="fas fa-cloud-download-alt me-2"></i>Unduh Dokumen</a>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-4 col-md-6">
-                            <div class="card doc-card h-100 p-4 text-center d-flex flex-column">
-                                <i class="fas fa-file-pdf icon-doc"></i>
-                                <h5 class="fw-bold text-dark mt-2">Permendagri No. 83 Tahun 2015</h5>
-                                <p class="text-muted small mt-2 mb-4">Sebagaimana telah diubah dengan Permendagri No. 67 Tahun 2017 tentang Pengangkatan dan Pemberhentian Perangkat Desa.</p>
-                                <a href="regulasi/Permendagri Nomor 83 Tahun 2015.pdf" download class="btn btn-outline-success btn-sm btn-rounded w-100 mt-auto fw-medium"><i class="fas fa-cloud-download-alt me-2"></i>Unduh Dokumen</a>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-4 col-md-6">
-                            <div class="card doc-card h-100 p-4 text-center d-flex flex-column">
-                                <i class="fas fa-book icon-doc"></i>
-                                <h5 class="fw-bold text-dark mt-2">Perda Kab. Malang No. 1 Tahun 2016</h5>
-                                <p class="text-muted small mt-2 mb-4">Sebagaimana telah diubah dengan Perda Kabupaten Malang No. 2 Tahun 2020 tentang Desa.</p>
-                                <a href="regulasi/Perda Kab.Malang Nomor 1 Tahun 2016.pdf" download class="btn btn-outline-success btn-sm btn-rounded w-100 mt-auto fw-medium"><i class="fas fa-cloud-download-alt me-2"></i>Unduh Dokumen</a>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-4 col-md-6">
-                            <div class="card doc-card h-100 p-4 text-center d-flex flex-column">
-                                <i class="fas fa-file-signature icon-doc"></i>
-                                <h5 class="fw-bold text-dark mt-2">Perbup Malang No. 81 Tahun 2017</h5>
-                                <p class="text-muted small mt-2 mb-4">Tentang Pedoman Pengangkatan dan Pemberhentian Perangkat Desa di Lingkungan Kabupaten Malang.</p>
-                                <a href="regulasi/Perbup Malang Nomor 81 Tahun 2017.pdf" download class="btn btn-outline-success btn-sm btn-rounded w-100 mt-auto fw-medium"><i class="fas fa-cloud-download-alt me-2"></i>Unduh Dokumen</a>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <footer class="footer text-center">
-                    <p class="mb-0 small">&copy; 2026 Dinas Pemberdayaan Masyarakat dan Desa Kabupaten Malang.</p>
-                </footer>
+                </div>
             </div>
         </div>
     </div>
-    
+
+    <div class="modal fade" id="modalLacak" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 18px; border: none; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+                <div class="modal-header border-0 pt-3 pb-3 px-4 text-white d-flex align-items-center justify-content-between" style="background-color: #198754;">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fas fa-route fs-5"></i>
+                        <h5 class="modal-title fw-bold m-0" style="font-size: 1.15rem; letter-spacing: 0.3px;">Tracking Usulan</h5>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                
+                <div class="modal-body p-4 bg-white">
+                    <div class="tracking-container">
+                        <div class="text-center mb-2">
+                            <span class="badge border bg-light text-dark px-3 py-2 fw-bold rounded-3" style="font-size: 0.82rem; letter-spacing: 0.5px;" id="lacakIdUsulan">
+                                <i class="fas fa-hashtag text-success me-1"></i>#USL-D34C84
+                            </span>
+                        </div>
+
+                        <div class="tracking-timeline-v2">
+                            
+                            <div class="timeline-item-v2 completed">
+                                <div class="timeline-icon-v2"><i class="fas fa-file-import"></i></div>
+                                <div class="timeline-content-v2">
+                                    <div class="timeline-title-v2">Berkas Diajukan oleh Desa</div>
+                                    <div class="timeline-time-v2" id="timeStep1">
+                                        <div><i class="far fa-clock"></i> Memuat...</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="timeline-item-v2 completed">
+                                <div class="timeline-icon-v2"><i class="fas fa-user-tie"></i></div>
+                                <div class="timeline-content-v2">
+                                    <div class="timeline-title-v2">Proses Penandatanganan Bupati</div>
+                                    <div class="timeline-time-v2" id="timeStep2">
+                                        <div><i class="far fa-clock"></i> Memuat...</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="timeline-item-v2 completed">
+                                <div class="timeline-icon-v2"><i class="fas fa-stamp"></i></div>
+                                <div class="timeline-content-v2">
+                                    <div class="timeline-title-v2">Surat Rekomendasi Turun</div>
+                                    <div class="timeline-time-v2" id="timeStep3">
+                                        <div><i class="far fa-clock"></i> Memuat...</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="timeline-item-v2 completed">
+                                <div class="timeline-icon-v2"><i class="fas fa-hands"></i></div>
+                                <div class="timeline-content-v2">
+                                    <div class="timeline-title-v2">Pengambilan Berkas Fisik</div>
+                                    <div class="timeline-time-v2" id="timeStep4">
+                                        <p class="timeline-desc-v2 m-0">Memuat...</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="timeline-item-v2 success-final">
+                                <div class="timeline-icon-v2"><i class="fas fa-check-double"></i></div>
+                                <div class="timeline-content-v2">
+                                    <div class="timeline-title-v2">Proses Selesai (Arsip SK)</div>
+                                    <div class="timeline-time-v2 text-success-custom" id="timeStep5">
+                                        <i class="fas fa-check-circle"></i> Selesai
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-0 pt-0 pb-4 px-4 bg-white justify-content-center">
+                    <button type="button" id="btnLihatSKModal" class="btn text-white w-100 py-2.5 fw-bold d-flex align-items-center justify-content-center gap-2 shadow-sm" style="background-color: #212529; border-radius: 10px; font-size: 0.9rem;" onclick="triggerSKDariLacak()">
+                        <i class="fas fa-file-pdf"></i> Lihat Dokumen SK Terunggah
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalLihatSK" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 15px; overflow: hidden;">
+                <div class="modal-header text-white border-0 d-flex justify-content-between align-items-center" style="background-color: var(--gov-primary);">
+                    <h6 class="modal-title fw-bold m-0" id="modalSKTitle">Preview Dokumen SK</h6>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0 bg-secondary" style="height: 82vh;">
+                    <iframe id="frameSK" src="" style="width: 100%; height: 100%; border: none;"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <script>
-        // 1. Inisialisasi Supabase
+        // KONEKSI KE SUPABASE
         const _supabaseUrl = 'https://trkppiiwtsanrkhfssbi.supabase.co'; 
-        const _supabaseKey = 'sb_publishable_Byr6eUuyMWGPGKnwuqw_Xg_86vR47uZ';
-        const supabase = window.supabase.createClient(_supabaseUrl, _supabaseKey);
+        const _supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRya3BwaWl3dHNhbnJraGZzc2JpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyMDQ2MjMsImV4cCI6MjA5Mzc4MDYyM30.3FXToAhNzMX7Bf73YHFL8TEsovp5Mt6qk-M2Fs0OVqo';                
+        
+        const supabaseClient = window.supabase.createClient(_supabaseUrl, _supabaseKey, {
+            auth: { persistSession: false }
+        });
 
-        // 2. Bypass Login untuk Localhost (Biar tidak terlempar ke index.html)
+        let dataPengajuanSelesai = [];
+        let indexTerpilihLacak = null;
         let desaLogin = localStorage.getItem('nama_desa');
-        let kecamatanLogin = localStorage.getItem('kecamatan');
-        const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
 
-        if (isLocal && !desaLogin) {
-            desaLogin = "Nama Desa Kamu"; // Ganti dengan nama desa di databasemu
-            kecamatanLogin = "Kecamatan Kamu";
-            localStorage.setItem('nama_desa', desaLogin);
-            localStorage.setItem('kecamatan', kecamatanLogin);
+        // Bypassing filter jika masih bernilai standar/dummy template
+        if (desaLogin === "Nama Desa Kamu" || desaLogin === "" || desaLogin === "null") {
+            desaLogin = null;
         }
 
-        if (!desaLogin) {
-            window.location.href = 'index.html';
-        }
-
-        // 3. Load Data & Profil
-        async function loadNotificationsDesa() {
+        // AMBIL DATA DARI DATABASE SUPABASE
+        async function loadDataSelesai() {
+            const tbody = document.getElementById('bodyTabelSelesai');
             try {
-                // Update Tampilan Profil
-                document.getElementById('profile-desa-name').innerText = "Desa " + desaLogin;
-                document.getElementById('profile-kecamatan').innerText = "Kec. " + (kecamatanLogin || "Malang");
-
-                const { data, error } = await supabase
+                let query = supabaseClient
                     .from('usulan')
                     .select('*')
-                    .eq('desa', desaLogin); 
+                    .in('status', ['Selesai', 'SK Diunggah', 'selesai', 'sk diunggah'])
+                    .order('created_at', { ascending: false });
 
+                if (desaLogin) {
+                    query = query.eq('desa', desaLogin);
+                }
+
+                const { data, error } = await query;
                 if (error) throw error;
-
-                // Logika Notifikasi bisa diletakkan di sini jika diperlukan kembali
-            } catch (err) {
-                console.error("Error:", err);
+                
+                dataPengajuanSelesai = data;
+                renderTabel(dataPengajuanSelesai);
+            } catch (error) { 
+                console.error("Supabase Error Detail:", error); 
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger py-4">
+                    <i class="fas fa-exclamation-triangle fs-2 mb-2"></i><br>
+                    <strong>Gagal memuat data!</strong><br>
+                    <span class="small text-muted">Detail Error: ${error.message || 'Cek Console'}</span>
+                </td></tr>`;
             }
         }
 
-        // Jalankan semua kode UI dan event listener saat DOM sudah ter-load
-        document.addEventListener('DOMContentLoaded', () => {
-            loadNotificationsDesa();
+        // RENDER DATA KE DALAM TABEL HTML
+        function renderTabel(data) {
+            const tbody = document.getElementById('bodyTabelSelesai');
+            tbody.innerHTML = '';
 
-            // Sidebar Toggle Menu
-            const menuToggle = document.getElementById("btnSidebarToggle");
-            if (menuToggle) {
-                menuToggle.addEventListener("click", function(e) {
-                    e.preventDefault();
-                    document.getElementById("wrapper").classList.toggle("toggled");
-                });
+            if(data.length === 0) {
+                const namaTampilDesa = desaLogin ? desaLogin : "Semua Desa (Mode Testing)";
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-5 text-muted"><i class="fas fa-folder-open fs-1 mb-3 opacity-50"></i><br>Belum ada arsip pengajuan yang selesai untuk ${namaTampilDesa}.</td></tr>`;
+                return;
             }
 
-            // Realtime Update Supabase
-            supabase.channel('changes').on('postgres_changes', { event: '*', schema: 'public', table: 'usulan' }, () => {
-                loadNotificationsDesa();
-            }).subscribe();
+            data.forEach((item, index) => {
+                const adaFile = (item.sk_url && item.sk_url !== 'null' && item.sk_url !== '');
+                const tglRaw = item.updated_at || item.created_at;
+                const tglObj = new Date(tglRaw);
+                const tglFormatted = tglObj.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+
+                const namaCalon = item.nama_calon ? item.nama_calon : `Perangkat Desa`;
+                const labelDesa = !desaLogin ? ` <span class="badge bg-warning text-dark ms-1">Desa ${item.desa}</span>` : '';
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="text-center fw-bold text-muted" style="font-size: 0.85rem;">${index + 1}</td>
+                        <td class="text-start">
+                            <div class="fw-bold text-dark" style="font-size: 0.95rem;">${namaCalon} ${labelDesa}</div>
+                            <div class="text-muted mt-1" style="font-size: 0.75rem;">
+                                <span class="badge bg-light text-dark border me-1">${item.jenis_layanan}</span>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div style="font-size: 0.85rem; font-weight: 500;">${tglFormatted}</div>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2 rounded-pill" style="font-size: 0.75rem;">
+                                <i class="fas fa-check-circle me-1"></i> <span class="status-text">Selesai</span>
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-aksi-group">
+                                <button onclick="bukaLacak(${index})" class="btn btn-sm btn-outline-secondary rounded-pill px-3 shadow-sm d-flex align-items-center" style="font-size: 0.75rem;">
+                                    <i class="fas fa-search-location me-1"></i> Lacak
+                                </button>
+                                <button onclick="bukaFileSK('${item.sk_url}', '${namaCalon}')" class="btn btn-sm ${adaFile ? 'btn-success' : 'btn-light text-muted'} rounded-pill px-3 shadow-sm d-flex align-items-center" style="font-size: 0.75rem;" ${adaFile ? '' : 'disabled'}>
+                                    <i class="fas fa-file-pdf me-1"></i> SK
+                                </button>
+                            </div>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        // FORMAT TANGGAL YANG AMAN
+        function formatTanggalLengkap(tglString, fallbackTeks = "Selesai Diproses") {
+            if (!tglString || tglString === 'null' || tglString === undefined) {
+                return fallbackTeks;
+            }
+            const tglObj = new Date(tglString);
+            if (isNaN(tglObj.getTime())) return fallbackTeks;
+
+            return tglObj.toLocaleDateString('id-ID', { 
+                day: '2-digit', month: 'short', year: 'numeric'
+            }) + " | " + tglObj.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + " WIB";
+        }
+
+        // FUNGSI UNTUK MEMBUKA MODAL LACAK (DINAMIS DENGAN DATA PENERIMA)
+        function bukaLacak(index) {
+            indexTerpilihLacak = index;
+            const item = dataPengajuanSelesai[index];
+            
+            // 1. Buat ID Usulan dinamis
+            const tokenUsulan = item.id_usulan ? item.id_usulan : "USL-" + (item.id ? String(item.id).substring(0, 6).toUpperCase() : "D34C84");
+            document.getElementById('lacakIdUsulan').innerHTML = `<i class="fas fa-hashtag text-success me-1"></i>#${tokenUsulan}`;
+
+            // 2. Set Tanggal Proses Berkas (Step 1 - Berkas Diajukan)
+            document.getElementById('timeStep1').innerHTML = `<div><i class="far fa-clock"></i> ${formatTanggalLengkap(item.created_at, "12 Mei 2026 | 15.06 WIB")}</div>`;
+
+            // 3. Set Tanggal Penandatanganan (Step 2)
+            let tglBupati = item.tgl_bupati || item.created_at; 
+            document.getElementById('timeStep2').innerHTML = `<div><i class="far fa-clock"></i> ${formatTanggalLengkap(tglBupati, "12 Mei 2026 | 15.07 WIB")}</div>`;
+
+            // 4. Set Surat Rekomendasi (Step 3)
+            let tglRekom = item.tgl_rekomendasi || item.updated_at;
+            document.getElementById('timeStep3').innerHTML = `<div><i class="far fa-clock"></i> ${formatTanggalLengkap(tglRekom, "12 Mei 2026 | 15.08 WIB")}</div>`;
+
+            // 5. Pengambilan Berkas Fisik (Step 4) - MENAMPILKAN NAMA, JABATAN & TANGGAL
+            if (item.nama_penerima && item.nama_penerima !== 'null') {
+                let teksPenerima = `<div class="text-dark fw-bold" style="font-size: 0.85rem;">${item.nama_penerima}`;
+                if (item.jabatan_penerima && item.jabatan_penerima !== 'null') {
+                    teksPenerima += ` <span class="text-muted fw-normal">(${item.jabatan_penerima})</span>`;
+                }
+                teksPenerima += `</div>`;
+                
+                // Menampilkan tanggal ambil di bawah nama
+                if (item.tgl_ambil && item.tgl_ambil !== 'null') {
+                    teksPenerima += `<div class="text-muted mt-1" style="font-size: 0.75rem;"><i class="far fa-clock"></i> ${formatTanggalLengkap(item.tgl_ambil)}</div>`;
+                }
+                document.getElementById('timeStep4').innerHTML = teksPenerima;
+            } else {
+                document.getElementById('timeStep4').innerHTML = `<p class="timeline-desc-v2 m-0">Belum ada data pengambilan</p>`;
+            }
+
+            // 6. Proses Selesai Akhir (Step 5) - HANYA MENAMPILKAN "Selesai"
+            document.getElementById('timeStep5').innerHTML = `<i class="fas fa-check-circle"></i> Selesai`;
+
+            // 7. Kunci Aktivasi Tombol Dokumen SK
+            const adaFile = (item.sk_url && item.sk_url !== 'null' && item.sk_url !== '');
+            const btnModal = document.getElementById('btnLihatSKModal');
+            if (adaFile) {
+                btnModal.disabled = false;
+                btnModal.style.opacity = "1";
+                btnModal.style.cursor = "pointer";
+            } else {
+                btnModal.disabled = true;
+                btnModal.style.opacity = "0.5";
+                btnModal.style.cursor = "not-allowed";
+            }
+
+            // Tampilkan Modal Lacak
+            new bootstrap.Modal(document.getElementById('modalLacak')).show();
+        }
+
+        // TRIGGER PEMBUKAAN FILE SK DARI MODAL TRACKING
+        function triggerSKDariLacak() {
+            if (indexTerpilihLacak !== null) {
+                const item = dataPengajuanSelesai[indexTerpilihLacak];
+                const namaCalon = item.nama_calon ? item.nama_calon : "Perangkat Desa";
+                
+                // Tutup modal lacak terlebih dahulu
+                bootstrap.Modal.getInstance(document.getElementById('modalLacak')).hide();
+                
+                // Buka modal SK
+                bukaFileSK(item.sk_url, namaCalon);
+            }
+        }
+
+        // FUNGSI UNTUK MEMBUKA FILE PDF (IFRAME MODAL)
+        function bukaFileSK(url, nama) {
+            document.getElementById('modalSKTitle').innerText = "SK Resmi - " + nama;
+            document.getElementById('frameSK').src = url;
+            new bootstrap.Modal(document.getElementById('modalLihatSK')).show();
+        }
+
+        // FILTER PENCARIAN
+        document.getElementById('inputCariUsulan').addEventListener('input', function() {
+            const keyword = this.value.toLowerCase();
+            const dataFiltered = dataPengajuanSelesai.filter(item => {
+                const nama = (item.nama_calon || item.desa || '').toLowerCase();
+                const jenis = (item.jenis_layanan || '').toLowerCase();
+                return nama.includes(keyword) || jenis.includes(keyword);
+            });
+            renderTabel(dataFiltered);
+        });
+
+        // TOGGLE SIDEBAR RESPONSIVE
+        const menuToggle = document.getElementById("btnSidebarToggle");
+        if (menuToggle) {
+            menuToggle.addEventListener("click", function(e) {
+                e.preventDefault();
+                document.getElementById("wrapper").classList.toggle("toggled");
+            });
+        }
+
+        // DAFTAR EVENT DOM LOAD & SUPABASE REALTIME
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDataSelesai();
+
+            supabaseClient
+              .channel('arsip_selesai_changes')
+              .on('postgres_changes', { event: '*', schema: 'public', table: 'usulan' }, (payload) => {
+                  loadDataSelesai(); 
+              })
+              .subscribe();
         });
     </script>
 </body>
