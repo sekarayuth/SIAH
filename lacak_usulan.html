@@ -100,7 +100,6 @@
                     <h5 class="m-0 fw-bold d-none d-sm-block text-dark">Ruang Kerja Pemerintah Desa</h5>
                 </div>
                 
-                <!-- ICON LONCENG NOTIFIKASI -->
                 <div class="d-flex align-items-center pe-2">
                     <div class="dropdown">
                         <button class="btn bg-light border-0 position-relative p-2 rounded-circle" type="button" id="dropdownNotif" data-bs-toggle="dropdown" aria-expanded="false">
@@ -148,7 +147,6 @@
                                 <option value="proses bupati">Proses Bupati</option>
                                 <option value="rekomendasi turun">Rekom Turun</option>
                                 <option value="sudah diambil">SK Belum Diunggah</option>
-                                <option value="sk diunggah">Selesai (SK Terbit)</option>
                                 <option value="ditolak">Ditolak / Revisi</option>
                             </select>
                         </div>
@@ -172,7 +170,7 @@
                         <div id="noDataMessage" class="text-center py-5 d-none">
                             <i class="fas fa-search fa-3x text-muted opacity-50 mb-3"></i>
                             <h5 class="fw-bold text-muted">Data Tidak Ditemukan</h5>
-                            <p class="text-muted small">Coba sesuaikan kata kunci atau filter yang Anda gunakan.</p>
+                            <p class="text-muted small">Coba sesuaikan kata kunci atau mungkin pengajuan Anda sudah masuk menu Selesai.</p>
                         </div>
                     </div>
                 </section>
@@ -180,7 +178,6 @@
         </div>
     </div>
 
-    <!-- Modal Detail Jejak Usulan -->
     <div class="modal fade" id="modalDetail" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg" style="border-radius: 15px; overflow: hidden;">
@@ -210,9 +207,6 @@
                     <h6 class="fw-bold mb-3"><i class="fas fa-history me-2 text-secondary"></i>Timeline Progres</h6>
                     <ul class="list-group list-group-flush mb-4" id="timelineList"></ul>
 
-                    <!-- ========================================================= -->
-                    <!-- FORM INLINE PENGAMBILAN DOKUMEN (MUNCUL SAAT REKOM TURUN) -->
-                    <!-- ========================================================= -->
                     <div id="areaFormAmbilDesa" class="d-none bg-info bg-opacity-10 border border-info rounded p-4 mb-2 shadow-sm">
                         <h6 class="fw-bold text-dark mb-2"><i class="fas fa-handshake me-2 text-info"></i>Form Serah Terima Surat Rekomendasi</h6>
                         <p class="small text-muted mb-3 border-bottom pb-2 border-info">Sesuai prosedur, silakan isi data penerima fisik Surat Rekomendasi sebelum Anda dapat mengunggah SK Anda.</p>
@@ -236,9 +230,7 @@
                             <i class="fas fa-check-circle me-1"></i> Simpan Data Pengambilan & Lanjut Upload SK
                         </button>
                     </div>
-                    <!-- ========================================================= -->
-
-                </div>
+                    </div>
                 
                 <div class="modal-footer bg-light border-0">
                     <button type="button" class="btn btn-outline-secondary px-4 fw-medium rounded-pill" data-bs-dismiss="modal">Tutup</button>
@@ -250,7 +242,6 @@
         </div>
     </div>
 
-    <!-- Modal Revisi Berkas -->
     <div class="modal fade" id="modalRevisiBerkas" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg" style="border-radius: 15px;">
@@ -276,7 +267,6 @@
         </div>
     </div>
 
-    <!-- Modal Upload SK -->
     <div class="modal fade" id="modalUploadSK" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg" style="border-radius: 15px;">
@@ -306,7 +296,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const _supabaseUrl = 'https://trkppiiwtsanrkhfssbi.supabase.co'; 
-        const _supabaseKey = 'sb_publishable_Byr6eUuyMWGPGKnwuqw_Xg_86vR47uZ';                
+        const _supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRya3BwaWl3dHNhbnJraGZzc2JpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyMDQ2MjMsImV4cCI6MjA5Mzc4MDYyM30.3FXToAhNzMX7Bf73YHFL8TEsovp5Mt6qk-M2Fs0OVqo';                
         const supabaseClient = window.supabase.createClient(_supabaseUrl, _supabaseKey);
 
         // FUNGSI UNTUK MENGHILANGKAN BADGE NOTIFIKASI SAAT DIKLIK
@@ -319,15 +309,18 @@
             tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4"><i class="fas fa-spinner fa-spin text-success fs-2 mb-3"></i><p class="text-muted mb-0">Memuat progres berkas Anda...</p></td></tr>`;
 
             try {
+                // LOGIKA FILTER: Jangan tampilkan status yang sudah selesai atau SK Diunggah di halaman ini
                 const { data, error } = await supabaseClient
                     .from('usulan')
                     .select('*')
+                    .neq('status', 'Selesai')
+                    .neq('status', 'SK Diunggah')
                     .order('created_at', { ascending: false });
 
                 if (error) throw error;
 
                 if (data.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="text-center py-5"><h5 class="text-secondary fw-bold">Belum Ada Pengajuan</h5><p class="text-muted mb-0">Silakan buat usulan baru.</p></td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="5" class="text-center py-5"><h5 class="text-secondary fw-bold">Belum Ada Pengajuan Aktif</h5><p class="text-muted mb-0">Silakan buat usulan baru atau cek menu Pengajuan Selesai.</p></td></tr>`;
                     document.getElementById('notifBadge').classList.add('d-none');
                     return;
                 }
@@ -350,7 +343,6 @@
                     else if(item.status === "Proses Bupati") { badgeClass = "bg-soft-primary"; iconClass = "fa-paper-plane"; }
                     else if(item.status === "Rekomendasi Turun") { badgeClass = "bg-soft-info"; iconClass = "fa-envelope-open-text"; }
                     else if(item.status === "Sudah Diambil") { badgeClass = "bg-soft-dark"; iconClass = "fa-exclamation-circle"; }
-                    else if(item.status === "SK Diunggah" || item.status === "Selesai") { badgeClass = "bg-soft-success"; iconClass = "fa-check-circle"; }
                     else if(item.status === "Ditolak" || item.status === "Revisi") { badgeClass = "bg-soft-danger"; iconClass = "fa-times-circle"; }
 
                     // MENGISI KONTEN LONCENG NOTIFIKASI
@@ -535,7 +527,10 @@
                     .from('usulan')
                     .update({ 
                         status: 'Sudah Diambil', 
-                        catatan_admin: catatanBaru
+                        catatan_admin: catatanBaru,
+                        nama_penerima: nama,
+                        jabatan_penerima: jabatan,
+                        tgl_ambil: tgl
                     })
                     .eq('id', id);
 
@@ -626,14 +621,16 @@
                 if (uploadError) throw uploadError;
 
                 const publicUrl = supabaseClient.storage.from('berkas_siah').getPublicUrl(`sk_akhir/${fileName}`).data.publicUrl;
+                
+                // --- PENTING: Update status menjadi Selesai ---
                 const { error: dbError } = await supabaseClient.from('usulan').update({ 
-                        status: 'SK Diunggah', 
+                        status: 'Selesai', 
                         sk_url: publicUrl,
                         catatan_admin: 'SK telah berhasil diunggah oleh Desa. Layanan selesai.'
                 }).eq('id', id);
 
                 if (dbError) throw dbError;
-                alert("SUKSES! SK berhasil diunggah dan proses layanan telah ditutup.");
+                alert("SUKSES! SK berhasil diunggah dan pengajuan telah dipindahkan ke menu Pengajuan Selesai.");
                 bootstrap.Modal.getInstance(document.getElementById('modalUploadSK')).hide();
                 muatDataUsulan(); 
             } catch (err) {
